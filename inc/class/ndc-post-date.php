@@ -45,6 +45,7 @@ if ( ! class_exists( 'NDC_Post_Date' ) ){
 				'single' => false,
 				'suffix' => 'अगाडि',
 			),
+			'post_types' => array('post'),
 		);
 
 		/**
@@ -150,6 +151,13 @@ if ( ! class_exists( 'NDC_Post_Date' ) ){
 				'ndc_post_date_options[human_time_diff]',
 				__( 'Activate Nepali Human Time Diff On', 'nepali-date-converter'),
 				array($this, 'human_time_diff_callback' ),
+				'general',
+				'ndc_post_date_section'
+			);
+			add_settings_field(
+				'ndc_post_date_options[post_types]',
+				__( 'Post Types Support', 'nepali-date-converter'),
+				array($this, 'post_types_callback' ),
 				'general',
 				'ndc_post_date_section'
 			);
@@ -374,6 +382,38 @@ if ( ! class_exists( 'NDC_Post_Date' ) ){
 		}
 
 		/**
+		 * Callback function of add_settings_field
+		 * Initialize from ndc_setting_options
+		 *
+		 * @since 2.0.3
+		 */
+		public function post_types_callback(){
+			$post_types = ndc_get_post_types();
+			$saved_post_types = $this->options['post_types'];
+			if( is_array( $post_types) && !empty( $post_types )){
+			    foreach ( $post_types as $post_type){
+			        ?>
+                    <fieldset>
+                        <legend class="screen-reader-text">
+                            <span><?php echo esc_html( $post_type['value']) ?></span>
+                        </legend>
+                        <label for="ndc_post_date_options[post_types][<?php echo esc_attr( $post_type['value']) ?>]">
+                            <input name="ndc_post_date_options[post_types][]" type="checkbox" id="ndc_post_date_options[human_time_diff][<?php echo esc_attr( $post_type['value']) ?>]" value="<?php echo esc_attr( $post_type['value']) ?>" <?php checked( true, in_array($post_type['value'], $saved_post_types)) ?> />
+                            <div class="date-time-text">
+	                            <?php echo esc_html( $post_type['label']) ?>
+                            </div>
+                        </label>
+                    </fieldset>
+                    <?php
+			    }
+			}
+
+			?>
+
+			<?php
+		}
+
+		/**
 		 * Callback function of register_setting
 		 * Initialize from ndc_setting_options
 		 *
@@ -400,6 +440,10 @@ if ( ! class_exists( 'NDC_Post_Date' ) ){
 			$options['human_time_diff']['archive'] = (isset( $options['human_time_diff']['archive'] ) );
 			$options['human_time_diff']['single'] = (isset( $options['human_time_diff']['single'] ) );
 			$options['human_time_diff']['suffix'] = sanitize_text_field($options['human_time_diff']['suffix']);
+
+			/*Post Type Support*/
+			$options['post_types'] = isset( $options['post_types'] )?array_map("sanitize_key",$options['post_types']):array();
+
 			return $options;
 		}
 
@@ -550,6 +594,11 @@ if ( ! class_exists( 'NDC_Post_Date' ) ){
 			else{
 				$result_format = $this->options['date_format']['selected'] !='ndc-date-format-custom'?$this->options['date_format']['selected']:$this->options['date_format']['custom'];
 			}
+
+			/*Post Type Check*/
+            if( !in_array($post->post_type, $this->options['post_types'])){
+                return $the_date;
+            }
 
 			/*for format U
 			just change num to nepali and return*/

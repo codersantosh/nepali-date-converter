@@ -3,8 +3,8 @@ Contributors: addonspress, acmeit, codersantosh
 Donate link: https://www.addonspress.com/
 Tags: nepali post date, post date nepal, nepali date converter, today nepali date, english to nepali date converter, nepali to english date converter, nepali date, date converter, nepali, nepal
 Requires at least: 4.9
-Tested up to: 5.7.1
-Stable tag: 2.0.2
+Tested up to: 5.8.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,7 +136,10 @@ Please use support [support forum](https://wordpress.org/support/plugin/nepali-d
 
 == Changelog ==
 
-= 2.0.1 - 2021-04-21 =
+= 2.0.3 - 2022-01-05 =
+* Added: Post Type Support
+
+= 2.0.2 - 2021-04-21 =
 * Updated: WordPress version
 
 = 2.0.1 - 2020-06-11 =

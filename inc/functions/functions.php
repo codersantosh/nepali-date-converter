@@ -223,3 +223,36 @@ function ndc_human_time_diff( $from, $to = 0 ) {
 	 */
 	return apply_filters( 'ndc_human_time_diff', $since, $diff, $from, $to );
 }
+
+
+/**
+ * Get Post Types.
+ *
+ * @since 2.1.0
+ */
+function ndc_get_post_types( $args = array( 'public' => true ), $excludes = array(), $includes = array() ) {
+
+	$post_types = get_post_types(
+		$args,
+		'objects'
+	);
+	$exclude_pt = array(
+		'edd_wish_list',
+		'elementor_library'
+	);
+	$exclude_pt = array_unique( array_merge( $exclude_pt, $excludes ) );
+	$exclude_pt = array_diff( $exclude_pt, $includes );
+	$exclude_pt = apply_filters( 'ndc_get_post_types', $exclude_pt, $excludes, $includes );
+
+	$options = array();
+	foreach ( $post_types as $post_type ) {
+		if ( in_array( $post_type->name, $exclude_pt ) ) {
+			continue;
+		}
+		$options[] = array(
+			'value' => $post_type->name,
+			'label' => $post_type->label,
+		);
+	}
+	return $options;
+}
