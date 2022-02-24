@@ -4,7 +4,7 @@ Donate link: https://www.addonspress.com/
 Tags: nepali post date, post date nepal, nepali date converter, today nepali date, english to nepali date converter, nepali to english date converter, nepali date, date converter, nepali, nepal
 Requires at least: 4.9
 Tested up to: 5.9
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,9 @@ Please use support [support forum](https://wordpress.org/support/plugin/nepali-d
 7. Frontend Display form shortcode and widget
 
 == Changelog ==
+
+= 2.0.5 - 2022-02-25 =
+* Fixed: Post Date Array notice in some cases
 
 = 2.0.4 - 2022-02-04 =
 * Updated: WordPress version
