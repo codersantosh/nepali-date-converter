@@ -535,7 +535,9 @@ if ( ! class_exists( 'NDC_Post_Date' ) ){
 		 */
 		function init_ndc_post_date(){
 			/*Use both admin and frontend*/
-			$this->options = apply_filters( 'ndc_post_date_options', get_option('ndc_post_date_options', $this->defaults));
+            $db_options = get_option('ndc_post_date_options', $this->defaults);
+            $db_options = array_merge($this->defaults, $db_options);
+			$this->options = apply_filters( 'ndc_post_date_options', $db_options);
 
 			/*return if in admin*/
 			if( is_admin()){
