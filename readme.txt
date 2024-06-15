@@ -4,13 +4,16 @@ Donate link: https://www.addonspress.com/
 Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nepali  date converter, Nepali to English date converter
 Requires at least: 4.9
 Tested up to: 6.5
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Effortlessly Convert between English and Nepali Dates, Including Converting Post Dates to Nepali Dates. Also supports displaying today's date.
 
 == Description ==
+
+If you're looking for a sleek and functional WordPress theme that integrates seamlessly with a Nepali date converter plugin, 
+check out this [free WordPress theme: CosmosWP](https://wordpress.org/themes/cosmoswp/). It comes with a [demo showcasing the Nepali date converter](https://demo.cosmoswp.com/demo-99/) plugin in action.
 
 Newly Added Feature: Convert Post Dates to Nepali Dates. Access the setting under Admin => Setting => General.
 
@@ -136,7 +139,10 @@ Please use support [support forum](https://wordpress.org/support/plugin/nepali-d
 
 == Changelog ==
 
-= 2.0.6 - 2023-04-07 =
+= 2.0.7 - 2024-06-15 =
+* Fixed : [Date issue](https://wordpress.org/support/topic/jestha-32-is-not-showing/)
+
+= 2.0.6 - 2024-04-07 =
 * Updated : Tested up WordPress 6.5
 
 = 2.0.5 - 2022-02-25 =
