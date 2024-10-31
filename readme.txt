@@ -3,8 +3,8 @@ Contributors: addonspress, acmeit, codersantosh
 Donate link: https://www.addonspress.com/
 Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nepali  date converter, Nepali to English date converter
 Requires at least: 4.9
-Tested up to: 6.5
-Stable tag: 2.0.7
+Tested up to: 6.7
+Stable tag: 2.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -138,6 +138,10 @@ Please use support [support forum](https://wordpress.org/support/plugin/nepali-d
 7. Frontend Display form shortcode and widget
 
 == Changelog ==
+
+= 2.0.8 - 2024-10-31 =
+* Added: WordPress latest compatibility
+* Added: Language folder
 
 = 2.0.7 - 2024-06-15 =
 * Fixed : [Date issue](https://wordpress.org/support/topic/jestha-32-is-not-showing/)
