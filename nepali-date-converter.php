@@ -3,7 +3,7 @@
 Plugin Name: Nepali Date Converter
 Plugin URI: https://www.addonspress.com/wordpress-plugins/nepali-date-converter/
 Description: Convert English to Nepali Date and Vice Versa and Post Date to Nepali Date.
-Version: 2.0.7
+Version: 2.0.8
 Author: addonspress
 Author URI: https://www.addonspress.com/
 License: GPLv2 or later
@@ -16,7 +16,7 @@ if ( ! function_exists( 'add_action' ) ) {
 	exit;
 }
 /*Define Constants for this plugin*/
-define( 'NEPALI_DATE_CONVERTER_VERSION', '2.0.7' );
+define( 'NEPALI_DATE_CONVERTER_VERSION', '2.0.8' );
 define( 'NEPALI_DATE_CONVERTER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NEPALI_DATE_CONVERTER_URL', plugin_dir_url( __FILE__ ) );
 define( 'NEPALI_DATE_CONVERTER_NAME', plugin_basename( __FILE__ ) );
