@@ -1,23 +1,23 @@
-# Copyright (C) 2024 addonspress
+# Copyright (C) 2025 addonspress
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nepali Date Converter 2.0.8\n"
+"Project-Id-Version: Nepali Date Converter 3.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nepali-date-converter\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-31T12:48:15+00:00\n"
+"POT-Creation-Date: 2025-03-28T17:37:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: nepali-date-converter\n"
 
 #. Plugin Name of the plugin
-#: inc/shortcode/shortcode-nepali-date-converter.php:12
-#: inc/widgets/widget-nepali-date-converter.php:37
-#: inc/widgets/widget-nepali-date-converter.php:163
+#: inc/shortcode/shortcode-nepali-date-converter.php:30
+#: inc/widgets/widget-nepali-date-converter.php:47
+#: inc/widgets/widget-nepali-date-converter.php:182
 msgid "Nepali Date Converter"
 msgstr ""
 
@@ -37,260 +37,296 @@ msgstr ""
 msgid "https://www.addonspress.com/"
 msgstr ""
 
-#: inc/class/ndc-frontend.php:199
+#: inc/class/ndc-frontend.php:407
 msgid "To Eng Date"
 msgstr ""
 
-#: inc/class/ndc-frontend.php:215
+#: inc/class/ndc-frontend.php:440
 msgid "To Nep Date"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:107
+#: inc/class/ndc-post-date.php:102
 msgid "Settings"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:124
+#: inc/class/ndc-post-date.php:117
 msgid "Nepali Post Date - Nepali Date Converter"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:131
+#: inc/class/ndc-post-date.php:134
 msgid "Activate Nepali Post Date On"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:138
-#: inc/class/ndc-post-date.php:258
+#: inc/class/ndc-post-date.php:142
+#: inc/class/ndc-post-date.php:263
 msgid "Date Format"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:145
-#: inc/class/ndc-post-date.php:305
-#: inc/class/ndc-post-date.php:309
+#: inc/class/ndc-post-date.php:150
+#: inc/class/ndc-post-date.php:311
+#: inc/class/ndc-post-date.php:314
 msgid "Force Format"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:152
+#: inc/class/ndc-post-date.php:158
 msgid "Activate Nepali Human Time Diff On"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:159
+#: inc/class/ndc-post-date.php:166
 msgid "Post Types Support"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:170
+#: inc/class/ndc-post-date.php:178
 msgid "All Options related to NDC Post Date"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:185
+#: inc/class/ndc-post-date.php:192
 msgid "All Options related to NDC Post Date."
 msgstr ""
 
-#: inc/class/ndc-post-date.php:186
-msgid " Does not work on following date format : 'S'"
+#: inc/class/ndc-post-date.php:193
+msgid " Does not work on following date format: 'S'"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:201
-#: inc/class/ndc-post-date.php:205
-#: inc/shortcode/shortcode-today-date.php:14
-#: inc/widgets/widget-today-date.php:32
-#: inc/widgets/widget-today-date.php:136
+#: inc/class/ndc-post-date.php:215
+#: inc/class/ndc-post-date.php:218
+#: inc/shortcode/shortcode-today-date.php:29
+#: inc/widgets/widget-today-date.php:42
+#: inc/widgets/widget-today-date.php:164
 msgid "Date"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:207
-msgid "It use get_the_date filter hook"
+#: inc/class/ndc-post-date.php:219
+msgid "Uses get_the_date filter hook"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:212
-#: inc/class/ndc-post-date.php:216
+#: inc/class/ndc-post-date.php:224
+#: inc/class/ndc-post-date.php:227
 msgid "Time"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:218
-msgid "It use get_the_time filter hook"
+#: inc/class/ndc-post-date.php:228
+msgid "Uses get_the_time filter hook"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:223
-#: inc/class/ndc-post-date.php:227
+#: inc/class/ndc-post-date.php:233
+#: inc/class/ndc-post-date.php:236
 msgid "Date (Modified)"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:229
-msgid "It use get_the_modified_date filter hook"
+#: inc/class/ndc-post-date.php:237
+msgid "Uses get_the_modified_date filter hook"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:234
-#: inc/class/ndc-post-date.php:238
+#: inc/class/ndc-post-date.php:242
+#: inc/class/ndc-post-date.php:245
 msgid "Time (Modified)"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:240
-msgid "It use get_the_modified_time filter hook"
-msgstr ""
-
-#: inc/class/ndc-post-date.php:276
-msgid "Custom:"
-msgstr ""
-
-#: inc/class/ndc-post-date.php:277
-msgid "enter a custom date format in the following field"
-msgstr ""
-
-#: inc/class/ndc-post-date.php:281
-msgid "Custom date format:"
+#: inc/class/ndc-post-date.php:246
+msgid "Uses get_the_modified_time filter hook"
 msgstr ""
 
 #: inc/class/ndc-post-date.php:285
-#: inc/class/ndc-post-date.php:377
+msgid "Custom:"
+msgstr ""
+
+#: inc/class/ndc-post-date.php:286
+msgid "enter a custom date format in the following field"
+msgstr ""
+
+#: inc/class/ndc-post-date.php:290
+msgid "Custom date format:"
+msgstr ""
+
+#: inc/class/ndc-post-date.php:294
+#: inc/class/ndc-post-date.php:372
 msgid "Preview:"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:311
-msgid "When you check it, hard coded format will be ignored. eg:"
+#: inc/class/ndc-post-date.php:315
+msgid "When enabled, hard coded formats will be ignored. Example:"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:327
 #: inc/class/ndc-post-date.php:331
+#: inc/class/ndc-post-date.php:334
 msgid "Front Page"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:337
+#: inc/class/ndc-post-date.php:339
 msgid "Home - Blog Home"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:341
-msgid "Home ( Blog Home )"
+#: inc/class/ndc-post-date.php:342
+msgid "Home (Blog Home)"
 msgstr ""
 
 #: inc/class/ndc-post-date.php:347
-#: inc/class/ndc-post-date.php:351
+#: inc/class/ndc-post-date.php:350
 msgid "Archive"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:357
-#: inc/class/ndc-post-date.php:361
+#: inc/class/ndc-post-date.php:355
+#: inc/class/ndc-post-date.php:358
 msgid "Single"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:367
-#: inc/class/ndc-post-date.php:370
+#: inc/class/ndc-post-date.php:363
+#: inc/class/ndc-post-date.php:365
 msgid "Suffix"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:374
+#: inc/class/ndc-post-date.php:368
 msgid "Example"
 msgstr ""
 
-#: inc/frameworks/nepali-calendar/nepali_calendar.php:391
-msgid "Supported only between 1944-2022"
+#: inc/class/ndc-post-date.php:389
+msgid "No post types found!"
 msgstr ""
 
-#: inc/frameworks/nepali-calendar/nepali_calendar.php:395
-#: inc/frameworks/nepali-calendar/nepali_calendar.php:419
-msgid "Error! month value can be between 1-12 only"
+#: inc/class/ndc-post-date.php:419
+msgid "Security check failed"
 msgstr ""
 
-#: inc/frameworks/nepali-calendar/nepali_calendar.php:399
-#: inc/frameworks/nepali-calendar/nepali_calendar.php:423
-msgid "Error! day value can be between 1-31 only"
+#: inc/class/ndc-post-date.php:548
+msgid "Error generating date preview"
 msgstr ""
 
-#: inc/frameworks/nepali-calendar/nepali_calendar.php:415
-msgid "Supported only between 2000-2089"
+#: inc/class/ndc-post-date.php:562
+msgid "Date format not provided"
 msgstr ""
 
-#: inc/functions/functions.php:25
-#: inc/functions/functions.php:61
+#: inc/class/ndc-post-date.php:570
+msgid "Invalid date format"
+msgstr ""
+
+#. translators: %s example array..
+#: inc/functions/functions.php:47
+#: inc/functions/functions.php:92
 msgid "Invalid array provided, please pass array in this format: %s"
 msgstr ""
 
-#: inc/shortcode/shortcode-nepali-date-converter.php:15
-#: inc/widgets/widget-nepali-date-converter.php:72
-#: inc/widgets/widget-nepali-date-converter.php:198
+#: inc/hooks/wp-ajax.php:35
+msgid "Invalid request parameters"
+msgstr ""
+
+#: inc/hooks/wp-ajax.php:55
+msgid "Conversion failed"
+msgstr ""
+
+#: inc/hooks/wp-footer.php:61
+msgid "Please wait..."
+msgstr ""
+
+#: inc/hooks/wp-footer.php:63
+msgid "कृपया पर्खनुहोस्..."
+msgstr ""
+
+#: inc/hooks/wp-footer.php:71
+msgid "Invalid response"
+msgstr ""
+
+#: inc/hooks/wp-footer.php:75
+msgid "Error processing request"
+msgstr ""
+
+#: inc/shortcode/shortcode-nepali-date-converter.php:33
+#: inc/widgets/widget-nepali-date-converter.php:52
+#: inc/widgets/widget-nepali-date-converter.php:187
 msgid "Nepali to English"
 msgstr ""
 
-#: inc/shortcode/shortcode-nepali-date-converter.php:16
-#: inc/widgets/widget-nepali-date-converter.php:79
-#: inc/widgets/widget-nepali-date-converter.php:205
+#: inc/shortcode/shortcode-nepali-date-converter.php:34
+#: inc/widgets/widget-nepali-date-converter.php:53
+#: inc/widgets/widget-nepali-date-converter.php:188
 msgid "English to Nepali"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:21
+#: inc/widgets/widget-nepali-date-converter.php:27
 msgid "NDC: Nepali Date Converter"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:23
+#: inc/widgets/widget-nepali-date-converter.php:29
 msgid "Easily convert English Date to Nepali Date and Vice Versa"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:84
-#: inc/widgets/widget-today-date.php:66
+#: inc/widgets/widget-nepali-date-converter.php:62
 msgid "Enter title:"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:89
+#: inc/widgets/widget-nepali-date-converter.php:74
 msgid "Disable convert nep to eng"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:92
+#: inc/widgets/widget-nepali-date-converter.php:81
 msgid "Disable convert eng to nep"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:95
-#: inc/widgets/widget-today-date.php:77
+#: inc/widgets/widget-nepali-date-converter.php:87
 msgid "Result format"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:96
-#: inc/widgets/widget-nepali-date-converter.php:115
-#: inc/widgets/widget-today-date.php:78
+#: inc/widgets/widget-nepali-date-converter.php:92
+#: inc/widgets/widget-nepali-date-converter.php:138
 msgid "1,25,9"
 msgstr ""
 
+#. translators: 1: Example date format, 2: Opening anchor tag to WordPress date formatting codex, 3: Closing anchor tag.
 #: inc/widgets/widget-nepali-date-converter.php:97
-#: inc/widgets/widget-today-date.php:79
-msgid "By default the date for is %s. Other %sdate format%s also supported except \"S\""
+#: inc/widgets/widget-today-date.php:96
+msgid "By default the date format is %1$s. Other %2$sdate formats%3$s also supported except \"S\""
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:100
-#: inc/widgets/widget-today-date.php:82
+#: inc/widgets/widget-nepali-date-converter.php:108
 msgid "Nepali date language"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:104
-#: inc/widgets/widget-today-date.php:86
+#: inc/widgets/widget-nepali-date-converter.php:115
+#: inc/widgets/widget-today-date.php:117
 msgid "Nepali"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:105
-#: inc/widgets/widget-today-date.php:87
+#: inc/widgets/widget-nepali-date-converter.php:116
+#: inc/widgets/widget-today-date.php:118
 msgid "English"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:114
+#: inc/widgets/widget-nepali-date-converter.php:133
 msgid "Nepali to english button text"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:118
+#: inc/widgets/widget-nepali-date-converter.php:143
 msgid "English to Nepali button text"
 msgstr ""
 
-#: inc/widgets/widget-nepali-date-converter.php:119
+#: inc/widgets/widget-nepali-date-converter.php:148
 msgid "Select option"
 msgstr ""
 
-#: inc/widgets/widget-today-date.php:21
+#: inc/widgets/widget-today-date.php:27
 msgid "NDC: Today Date"
 msgstr ""
 
-#: inc/widgets/widget-today-date.php:23
+#: inc/widgets/widget-today-date.php:29
 msgid "Show Today English Date / Nepali Date"
 msgstr ""
 
-#: inc/widgets/widget-today-date.php:71
+#: inc/widgets/widget-today-date.php:54
+msgid "Title:"
+msgstr ""
+
+#: inc/widgets/widget-today-date.php:69
 msgid "Disable today nep date"
 msgstr ""
 
-#: inc/widgets/widget-today-date.php:74
+#: inc/widgets/widget-today-date.php:78
 msgid "Disable today eng date"
+msgstr ""
+
+#: inc/widgets/widget-today-date.php:84
+msgid "Result format:"
+msgstr ""
+
+#: inc/widgets/widget-today-date.php:110
+msgid "Nepali date language:"
 msgstr ""
