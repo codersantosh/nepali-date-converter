@@ -1,242 +1,220 @@
-<?php
-/*Make sure we don't expose any info if called directly*/
-if ( !function_exists( 'add_action' ) ) {
-    echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
-    exit;
+<?php // phpcs:ignore
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
+
+/**
+ * Nepali Date Converter Widget
+ *
+ * @package Nepali Date Converter
+ * @since 1.0.0
+ */
 
 if ( ! class_exists( 'Widget_NDC' ) ) {
-    /**
-     * Class for adding widget
-     *
-     * @package Coder Customizer Framework
-     * @since 1.0
-     */
-    class Widget_NDC extends WP_Widget {
-        function __construct() {
-            parent::__construct(
-            /*Base ID of your widget*/
-                'widget_nepali_date_converter',
-                /*Widget name will appear in UI*/
-                __('NDC: Nepali Date Converter', 'nepali-date-converter'),
-                /*Widget description*/
-                array( 'description' => __( 'Easily convert English Date to Nepali Date and Vice Versa', 'nepali-date-converter' ), )
-            );
-            /*load scripts for date converting*/
-            if(is_active_widget(false, false, $this->id_base)) {
-                add_action( 'wp_enqueue_scripts', 'ndc_widget_scripts' );
-                add_action('wp_footer', 'ndc_widget_wp_footer');
-            }
-        }
-        /*Widget Backend*/
-        public function form( $instance ) {
-            if ( isset( $instance[ 'title' ] ) ) {
-                $title = $instance[ 'title' ];
-            }
-            else {
-                $title = __( 'Nepali Date Converter', 'nepali-date-converter' );
-            }
 
-            if ( isset( $instance[ 'disable_ndc_convert_nep_to_eng' ] ) ) {
-                $disable_ndc_convert_nep_to_eng = $instance[ 'disable_ndc_convert_nep_to_eng' ];
-            }
-            else {
-                $disable_ndc_convert_nep_to_eng = '';
-            }
+	/**
+	 * Class Widget_NDC - Nepali Date Converter Widget
+	 */
+	class Widget_NDC extends WP_Widget {
 
-            if ( isset( $instance[ 'disable_ndc_convert_eng_to_nep' ] ) ) {
-                $disable_ndc_convert_eng_to_nep = $instance[ 'disable_ndc_convert_eng_to_nep' ];
-            }
-            else {
-                $disable_ndc_convert_eng_to_nep = '';
-            }
+		/**
+		 * Widget constructor
+		 */
+		public function __construct() {
+			parent::__construct(
+				'widget_nepali_date_converter',
+				__( 'NDC: Nepali Date Converter', 'nepali-date-converter' ),
+				array(
+					'description' => __( 'Easily convert English Date to Nepali Date and Vice Versa', 'nepali-date-converter' ),
+				)
+			);
 
-            if ( isset( $instance[ 'nepali_date_converter_result_format' ] ) ) {
-                $nepali_date_converter_result_format = $instance[ 'nepali_date_converter_result_format' ];
-            }
-            else {
-                $nepali_date_converter_result_format = 'D, F j, Y';
-            }
+			// Load scripts only if widget is active.
+			if ( is_active_widget( false, false, $this->id_base ) ) {
+				add_action( 'wp_enqueue_scripts', 'ndc_widget_scripts' );
+				add_action( 'wp_footer', 'ndc_widget_wp_footer' );
+			}
+		}
 
-            if ( isset( $instance[ 'nepali_date_lang' ] ) ) {
-                $nepali_date_lang = $instance[ 'nepali_date_lang' ];
-            }
-            else {
-                $nepali_date_lang = 'nep_char';
-            }
+		/**
+		 * Widget backend form
+		 *
+		 * @param array $instance Current widget instance.
+		 */
+		public function form( $instance ) {
+			$defaults = array(
+				'title'                               => __( 'Nepali Date Converter', 'nepali-date-converter' ),
+				'disable_ndc_convert_nep_to_eng'      => '',
+				'disable_ndc_convert_eng_to_nep'      => '',
+				'nepali_date_converter_result_format' => 'D, F j, Y',
+				'nepali_date_lang'                    => 'nep_char',
+				'nep_to_eng_button_text'              => __( 'Nepali to English', 'nepali-date-converter' ),
+				'eng_to_nep_button_text'              => __( 'English to Nepali', 'nepali-date-converter' ),
+			);
 
-            if ( isset( $instance[ 'nep_to_eng_button_text' ] ) ) {
-                $nep_to_eng_button_text = $instance[ 'nep_to_eng_button_text' ];
-            }
-            else {
-                $nep_to_eng_button_text = __('Nepali to English','nepali-date-converter');
-            }
+			$instance = wp_parse_args( (array) $instance, $defaults );
 
-            if ( isset( $instance[ 'eng_to_nep_button_text' ] ) ) {
-                $eng_to_nep_button_text = $instance[ 'eng_to_nep_button_text' ];
-            }
-            else {
-                $eng_to_nep_button_text = __('English to Nepali','nepali-date-converter');
-            }
-            /*Widget admin form*/
-            ?>
-            <p>
-                <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Enter title:' ,'nepali-date-converter'); ?></label>
-                <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
-            </p>
-            <p>
-                <input id="<?php echo $this->get_field_id('disable_ndc_convert_nep_to_eng'); ?>" name="<?php echo $this->get_field_name('disable_ndc_convert_nep_to_eng'); ?>" type="checkbox" value="1" <?php checked( 1, $disable_ndc_convert_nep_to_eng ); ?> />
-                <label for="<?php echo $this->get_field_id('disable_ndc_convert_nep_to_eng'); ?>"><?php _e('Disable convert nep to eng', 'nepali-date-converter'); ?></label><br>
+			// Form fields.
+			?>
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
+					<?php esc_html_e( 'Enter title:', 'nepali-date-converter' ); ?>
+				</label>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" 
+					name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" 
+					type="text" value="<?php echo esc_attr( $instance['title'] ); ?>" />
+			</p>
 
-                <input id="<?php echo $this->get_field_id('disable_ndc_convert_eng_to_nep'); ?>" name="<?php echo $this->get_field_name('disable_ndc_convert_eng_to_nep'); ?>" type="checkbox" value="1" <?php checked( '1', $disable_ndc_convert_eng_to_nep ); ?> />
-                <label for="<?php echo $this->get_field_id('disable_ndc_convert_eng_to_nep'); ?>"><?php _e('Disable convert eng to nep', 'nepali-date-converter'); ?></label><br>
-            </p>
-            <p>
-                <label for="<?php echo $this->get_field_id( 'nepali_date_converter_result_format' ); ?>"><?php _e( 'Result format' ,'nepali-date-converter'); ?></label>
-                <input class="widefat" id="<?php echo $this->get_field_id( 'nepali_date_converter_result_format' ); ?>" name="<?php echo $this->get_field_name( 'nepali_date_converter_result_format' ); ?>" type="text" value="<?php echo esc_attr( $nepali_date_converter_result_format ); ?>" placeholder="<?php _e( '1,25,9' ,'nepali-date-converter'); ?>"/>
-                <small><?php printf( esc_html__( 'By default the date for is %s. Other %sdate format%s also supported except "S"', 'nepali-date-converter' ), '<code style="background: #ddd;display: inline;padding: 5px">D, F j, Y</code>',"<a href='https://codex.wordpress.org/Formatting_Date_and_Time' target='_blank'>","</a>" ) ?></small>
-            </p>
-            <p>
-                <label for="<?php echo $this->get_field_id( 'nepali_date_lang' ); ?>"><?php _e( 'Nepali date language' ,'nepali-date-converter'); ?></label>
-                <select class="widefat" name="<?php echo $this->get_field_name( 'nepali_date_lang' ); ?>" id="<?php echo $this->get_field_id( 'nepali_date_lang' ); ?>">
-                    <?php
-                    $nepali_date_lang_array = array(
-                      'nep_char' => __('Nepali', 'nepali-date-converter'),
-                      'eng_char' => __('English', 'nepali-date-converter'),
-                    );
-                    foreach( $nepali_date_lang_array as $nepali_date_value=>$nepali_date_option ){
-                        echo "<option value='".$nepali_date_value."' ".selected( $nepali_date_value, $nepali_date_lang, 0 ).">".$nepali_date_option."</option>";
-                    }
-                    ?>
-                </select>
-            </p>
-            <p>
-                <label for="<?php echo $this->get_field_id( 'nep_to_eng_button_text' ); ?>"><?php _e( 'Nepali to english button text' ,'nepali-date-converter'); ?></label>
-                <input class="widefat" id="<?php echo $this->get_field_id( 'nep_to_eng_button_text' ); ?>" name="<?php echo $this->get_field_name( 'nep_to_eng_button_text' ); ?>" type="text" value="<?php echo esc_attr( $nep_to_eng_button_text ); ?>" placeholder="<?php _e( '1,25,9' ,'nepali-date-converter'); ?>"/>
-            </p>
-            <p>
-                <label for="<?php echo $this->get_field_id( 'eng_to_nep_button_text' ); ?>"><?php _e( 'English to Nepali button text' ,'nepali-date-converter'); ?></label>
-                <input class="widefat" id="<?php echo $this->get_field_id( 'eng_to_nep_button_text' ); ?>" name="<?php echo $this->get_field_name( 'eng_to_nep_button_text' ); ?>" type="text" value="<?php echo esc_attr( $eng_to_nep_button_text ); ?>" placeholder="<?php _e( 'Select option' ,'nepali-date-converter'); ?>"/>
-            </p>
-            <?php
-        }
+			<p>
+				<input id="<?php echo esc_attr( $this->get_field_id( 'disable_ndc_convert_nep_to_eng' ) ); ?>" 
+					name="<?php echo esc_attr( $this->get_field_name( 'disable_ndc_convert_nep_to_eng' ) ); ?>" 
+					type="checkbox" value="1" <?php checked( 1, $instance['disable_ndc_convert_nep_to_eng'] ); ?> />
+				<label for="<?php echo esc_attr( $this->get_field_id( 'disable_ndc_convert_nep_to_eng' ) ); ?>">
+					<?php esc_html_e( 'Disable convert nep to eng', 'nepali-date-converter' ); ?>
+				</label><br>
 
-        /**
-         * Function to Updating widget replacing old instances with new
-         *
-         * @access public
-         * @since 1.0
-         *
-         * @param array $new_instance new arrays value
-         * @param array $old_instance old arrays value
-         * @return array
-         *
-         */
-        public function update( $new_instance, $old_instance ) {
-            $instance = array();
-            $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-            $instance['disable_ndc_convert_nep_to_eng'] = ( ! empty( $new_instance['disable_ndc_convert_nep_to_eng'] ) ) ? strip_tags( $new_instance['disable_ndc_convert_nep_to_eng'] ) : '';
-            $instance['disable_ndc_convert_eng_to_nep'] = ( ! empty( $new_instance['disable_ndc_convert_eng_to_nep'] ) ) ? strip_tags( $new_instance['disable_ndc_convert_eng_to_nep'] ) : '';
-            $instance['nepali_date_converter_result_format'] = ( ! empty( $new_instance['nepali_date_converter_result_format'] ) ) ? sanitize_text_field( $new_instance['nepali_date_converter_result_format'] ) : '';
-            $instance['nepali_date_lang'] = ( ! empty( $new_instance['nepali_date_lang'] ) ) ? sanitize_text_field( $new_instance['nepali_date_lang'] ) : '';
-            $instance['nep_to_eng_button_text'] = ( ! empty( $new_instance['nep_to_eng_button_text'] ) ) ? sanitize_text_field( $new_instance['nep_to_eng_button_text'] ) : '';
-            $instance['eng_to_nep_button_text'] = ( ! empty( $new_instance['eng_to_nep_button_text'] ) ) ? sanitize_text_field( $new_instance['eng_to_nep_button_text'] ) : '';
+				<input id="<?php echo esc_attr( $this->get_field_id( 'disable_ndc_convert_eng_to_nep' ) ); ?>" 
+					name="<?php echo esc_attr( $this->get_field_name( 'disable_ndc_convert_eng_to_nep' ) ); ?>" 
+					type="checkbox" value="1" <?php checked( 1, $instance['disable_ndc_convert_eng_to_nep'] ); ?> />
+				<label for="<?php echo esc_attr( $this->get_field_id( 'disable_ndc_convert_eng_to_nep' ) ); ?>">
+					<?php esc_html_e( 'Disable convert eng to nep', 'nepali-date-converter' ); ?>
+				</label><br>
+			</p>
 
-            return $instance;
-        }
-        /**
-         * Function to Creating widget front-end. This is where the action happens
-         *
-         * @access public
-         * @since 1.0
-         *
-         * @param array $args widget setting
-         * @param array $instance saved values
-         * @return array
-         *
-         */
-        public function widget( $args, $instance ) {
-	        if ( isset( $instance[ 'title' ] ) ) {
-		        $title = $instance[ 'title' ];
-	        }
-	        else {
-		        $title = __( 'Nepali Date Converter', 'nepali-date-converter' );
-	        }
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'nepali_date_converter_result_format' ) ); ?>">
+					<?php esc_html_e( 'Result format', 'nepali-date-converter' ); ?>
+				</label>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'nepali_date_converter_result_format' ) ); ?>" 
+					name="<?php echo esc_attr( $this->get_field_name( 'nepali_date_converter_result_format' ) ); ?>" 
+					type="text" value="<?php echo esc_attr( $instance['nepali_date_converter_result_format'] ); ?>" 
+					placeholder="<?php esc_attr_e( '1,25,9', 'nepali-date-converter' ); ?>"/>
+				<small>
+					<?php
+					printf(
+						// translators: 1: Example date format, 2: Opening anchor tag to WordPress date formatting codex, 3: Closing anchor tag.
+						esc_html__( 'By default the date format is %1$s. Other %2$sdate formats%3$s also supported except "S"', 'nepali-date-converter' ),
+						'<code style="background: #ddd;display: inline;padding: 5px">D, F j, Y</code>',
+						'<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">',
+						'</a>'
+					);
+					?>
+				</small>
+			</p>
 
-	        if ( isset( $instance[ 'disable_ndc_convert_nep_to_eng' ] ) ) {
-		        $disable_ndc_convert_nep_to_eng = $instance[ 'disable_ndc_convert_nep_to_eng' ];
-	        }
-	        else {
-		        $disable_ndc_convert_nep_to_eng = '';
-	        }
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'nepali_date_lang' ) ); ?>">
+					<?php esc_html_e( 'Nepali date language', 'nepali-date-converter' ); ?>
+				</label>
+				<select class="widefat" 
+					name="<?php echo esc_attr( $this->get_field_name( 'nepali_date_lang' ) ); ?>" 
+					id="<?php echo esc_attr( $this->get_field_id( 'nepali_date_lang' ) ); ?>">
+					<?php
+					$options = array(
+						'nep_char' => __( 'Nepali', 'nepali-date-converter' ),
+						'eng_char' => __( 'English', 'nepali-date-converter' ),
+					);
 
-	        if ( isset( $instance[ 'disable_ndc_convert_eng_to_nep' ] ) ) {
-		        $disable_ndc_convert_eng_to_nep = $instance[ 'disable_ndc_convert_eng_to_nep' ];
-	        }
-	        else {
-		        $disable_ndc_convert_eng_to_nep = '';
-	        }
+					foreach ( $options as $value => $label ) {
+						printf(
+							'<option value="%s" %s>%s</option>',
+							esc_attr( $value ),
+							selected( $value, $instance['nepali_date_lang'], false ),
+							esc_html( $label )
+						);
+					}
+					?>
+				</select>
+			</p>
 
-	        if ( isset( $instance[ 'nepali_date_converter_result_format' ] ) ) {
-		        $nepali_date_converter_result_format = $instance[ 'nepali_date_converter_result_format' ];
-	        }
-	        else {
-		        $nepali_date_converter_result_format = 'D, F j, Y';
-	        }
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'nep_to_eng_button_text' ) ); ?>">
+					<?php esc_html_e( 'Nepali to english button text', 'nepali-date-converter' ); ?>
+				</label>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'nep_to_eng_button_text' ) ); ?>" 
+					name="<?php echo esc_attr( $this->get_field_name( 'nep_to_eng_button_text' ) ); ?>" 
+					type="text" value="<?php echo esc_attr( $instance['nep_to_eng_button_text'] ); ?>" 
+					placeholder="<?php esc_attr_e( '1,25,9', 'nepali-date-converter' ); ?>"/>
+			</p>
 
-	        if ( isset( $instance[ 'nepali_date_lang' ] ) ) {
-		        $nepali_date_lang = $instance[ 'nepali_date_lang' ];
-	        }
-	        else {
-		        $nepali_date_lang = 'nep_char';
-	        }
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'eng_to_nep_button_text' ) ); ?>">
+					<?php esc_html_e( 'English to Nepali button text', 'nepali-date-converter' ); ?>
+				</label>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'eng_to_nep_button_text' ) ); ?>" 
+					name="<?php echo esc_attr( $this->get_field_name( 'eng_to_nep_button_text' ) ); ?>" 
+					type="text" value="<?php echo esc_attr( $instance['eng_to_nep_button_text'] ); ?>" 
+					placeholder="<?php esc_attr_e( 'Select option', 'nepali-date-converter' ); ?>"/>
+			</p>
+			<?php
+		}
 
-	        if ( isset( $instance[ 'nep_to_eng_button_text' ] ) ) {
-		        $nep_to_eng_button_text = $instance[ 'nep_to_eng_button_text' ];
-	        }
-	        else {
-		        $nep_to_eng_button_text = __('Nepali to English','nepali-date-converter');
-	        }
+		/**
+		 * Update widget settings
+		 *
+		 * @param array $new_instance New settings.
+		 * @param array $old_instance Old settings.
+		 * @return array Updated settings
+		 */
+		public function update( $new_instance, $old_instance ) {
+			$instance = array();
 
-	        if ( isset( $instance[ 'eng_to_nep_button_text' ] ) ) {
-		        $eng_to_nep_button_text = $instance[ 'eng_to_nep_button_text' ];
-	        }
-	        else {
-		        $eng_to_nep_button_text = __('English to Nepali','nepali-date-converter');
-	        }
+			$instance['title']                               = sanitize_text_field( $new_instance['title'] ?? '' );
+			$instance['disable_ndc_convert_nep_to_eng']      = isset( $new_instance['disable_ndc_convert_nep_to_eng'] ) ? 1 : 0;
+			$instance['disable_ndc_convert_eng_to_nep']      = isset( $new_instance['disable_ndc_convert_eng_to_nep'] ) ? 1 : 0;
+			$instance['nepali_date_converter_result_format'] = sanitize_text_field( $new_instance['nepali_date_converter_result_format'] ?? '' );
+			$instance['nepali_date_lang']                    = sanitize_text_field( $new_instance['nepali_date_lang'] ?? '' );
+			$instance['nep_to_eng_button_text']              = sanitize_text_field( $new_instance['nep_to_eng_button_text'] ?? '' );
+			$instance['eng_to_nep_button_text']              = sanitize_text_field( $new_instance['eng_to_nep_button_text'] ?? '' );
 
-	        $title = apply_filters( 'widget_title', $title);
+			return $instance;
+		}
 
-	        ndc_frontend()->nepali_date_converter(array(
-                'before'=> $args['before_widget'],
-                'after'=> $args['after_widget'],
-                'before_title'=> $args['before_title'],
-                'after_title'=> $args['after_title'],
-                'title'=> $title,
-                'disable_ndc_convert_nep_to_eng'=> $disable_ndc_convert_nep_to_eng,
-                'disable_ndc_convert_eng_to_nep'=> $disable_ndc_convert_eng_to_nep,
-                'nepali_date_lang'=> $nepali_date_lang,
-                'nep_to_eng_button_text'=> $nep_to_eng_button_text,
-                'eng_to_nep_button_text'=> $eng_to_nep_button_text,
-                'result_format'=> $nepali_date_converter_result_format,
-            ));
-        }
-    } // Class Widget_NDC ends here
+		/**
+		 * Display the widget
+		 *
+		 * @param array $args Widget arguments.
+		 * @param array $instance Widget instance.
+		 */
+		public function widget( $args, $instance ) {
+			$defaults = array(
+				'title'                               => __( 'Nepali Date Converter', 'nepali-date-converter' ),
+				'disable_ndc_convert_nep_to_eng'      => '',
+				'disable_ndc_convert_eng_to_nep'      => '',
+				'nepali_date_converter_result_format' => 'D, F j, Y',
+				'nepali_date_lang'                    => 'nep_char',
+				'nep_to_eng_button_text'              => __( 'Nepali to English', 'nepali-date-converter' ),
+				'eng_to_nep_button_text'              => __( 'English to Nepali', 'nepali-date-converter' ),
+			);
 
+			$instance = wp_parse_args( (array) $instance, $defaults );
+			$title    = apply_filters( 'widget_title', $instance['title'] );
+
+			// Display the widget.
+			ndc_frontend()->nepali_date_converter(
+				array(
+					'before'                         => $args['before_widget'],
+					'after'                          => $args['after_widget'],
+					'before_title'                   => $args['before_title'],
+					'after_title'                    => $args['after_title'],
+					'title'                          => $title,
+					'disable_ndc_convert_nep_to_eng' => $instance['disable_ndc_convert_nep_to_eng'],
+					'disable_ndc_convert_eng_to_nep' => $instance['disable_ndc_convert_eng_to_nep'],
+					'nepali_date_lang'               => $instance['nepali_date_lang'],
+					'nep_to_eng_button_text'         => $instance['nep_to_eng_button_text'],
+					'eng_to_nep_button_text'         => $instance['eng_to_nep_button_text'],
+					'result_format'                  => $instance['nepali_date_converter_result_format'],
+				)
+			);
+		}
+	}
 }
 
-if ( ! function_exists( 'coder_widget_nepali_date_converter' ) ) :
-    /**
-     * Function to Register and load the widget
-     *
-     * @since 1.0
-     *
-     * @param null
-     * @return null
-     *
-     */
-    function coder_widget_nepali_date_converter() {
-        register_widget( 'Widget_NDC' );
-    }
-endif;
-add_action( 'widgets_init', 'coder_widget_nepali_date_converter' );
+/**
+ * Register the widget
+ */
+function register_ndc_widget() {//phpcs:ignore
+	register_widget( 'Widget_NDC' );
+}
+add_action( 'widgets_init', 'register_ndc_widget' );

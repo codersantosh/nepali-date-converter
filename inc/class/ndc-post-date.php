@@ -1,655 +1,697 @@
-<?php
+<?php // phpcs:ignore Class file names should be based on the class name with "class-" prepended.
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 /**
- * NDC Post Date Setting
+ * NDC Post Date Setting - Handles Nepali date conversion for post dates
  *
- * @since NDC 2.0.0
+ * @package Nepali Date Converter
+ * @since 2.0.0
  */
-if ( ! class_exists( 'NDC_Post_Date' ) ){
 
+if ( ! class_exists( 'NDC_Post_Date' ) ) {
+	/**
+	 * Class NDC_Post_Date
+	 *
+	 * Handles Nepali date conversion for post dates in WordPress.
+	 */
 	class NDC_Post_Date {
 
 		/**
-		 * Variable to hold options
+		 * Plugin options
 		 *
 		 * @var array
-		 * @access protected
 		 * @since 2.0.0
-		 *
 		 */
-		protected $options;
+		private $options;
 
 		/**
-		 * Variable to hold default options
+		 * Default plugin options
 		 *
 		 * @var array
-		 * @access protected
 		 * @since 2.0.0
-		 *
 		 */
-		protected $defaults = array(
-			'active' => array(
-				'date' => false,
-				'time' => false,
+		private const DEFAULTS = array(
+			'active'          => array(
+				'date'          => false,
+				'time'          => false,
 				'modified_date' => false,
-				'modified_time' => false
+				'modified_time' => false,
 			),
-			'date_format' => array(
+			'date_format'     => array(
 				'selected' => 'F j, Y',
-				'custom' => '',
+				'custom'   => '',
 			),
-			'force_format' => false,
+			'force_format'    => false,
 			'human_time_diff' => array(
-				'front' => false,
-				'home' => false,
+				'front'   => false,
+				'home'    => false,
 				'archive' => false,
-				'single' => false,
-				'suffix' => 'अगाडि',
+				'single'  => false,
+				'suffix'  => 'अगाडि',
 			),
-			'post_types' => array('post'),
+			'post_types'      => array( 'post' ),
 		);
 
 		/**
-		 * Construct
-		 * Nothing here
+		 * Singleton instance
 		 *
+		 * @var NDC_Post_Date|null
 		 * @since 2.0.0
-		 *
 		 */
-		public function __construct() {}
+		private static $instance = null;
 
 		/**
-		 * Gets an instance of this object.
-		 * Prevents duplicate instances which avoid artefacts and improves performance.
+		 * Gets the singleton instance
 		 *
-		 * @static
-		 * @access public
+		 * @return NDC_Post_Date
 		 * @since 2.0.0
-		 * @return object
 		 */
-		public static function get_instance() {
-
-			// Store the instance locally to avoid private static replication
-			static $instance = null;
-
-			// Only run these methods if they haven't been ran previously
-			if ( null === $instance ) {
-				$instance = new self();
+		public static function get_instance(): NDC_Post_Date {
+			if ( null === self::$instance ) {
+				self::$instance = new self();
 			}
-
-			// Always return the instance
-			return $instance;
+			return self::$instance;
 		}
 
 		/**
-		 * Run this Class Module
+		 * Initialize the module
 		 *
-		 * @access public
 		 * @since 2.0.0
-		 * @return void
 		 */
-		public function run(){
-			add_action('admin_init', array($this, 'ndc_setting_options'));
-			add_action('admin_head', array($this, 'options_general_add_js'));
-			add_action('wp_ajax_ndc_date_format', array($this, 'get_date_format'));
-			add_action('init', array($this, 'init_ndc_post_date'));
-			add_action('plugin_action_links_'.NEPALI_DATE_CONVERTER_NAME, array($this, 'action_link'));
+		public function run(): void {
+			add_action( 'admin_init', array( $this, 'register_settings' ) );
+			add_action( 'admin_head', array( $this, 'add_settings_js' ) );
+			add_action( 'wp_ajax_ndc_date_format', array( $this, 'ajax_get_date_format' ) );
+			add_action( 'init', array( $this, 'init' ) );
+			add_filter( 'plugin_action_links_' . NEPALI_DATE_CONVERTER_NAME, array( $this, 'add_settings_link' ) );
 		}
 
 		/**
-		 * Callback function of admin_init
-		 * Admin =>Setting => General
-		 * @param $links array
-         *
+		 * Add settings link to plugin action links
+		 *
+		 * @param array $links Existing plugin action links.
+		 * @return array Modified plugin action links
 		 * @since 2.0.1
-		 *
 		 */
-		public function action_link($links){
-			$settings_link = '<a href="options-general.php#ndc-post-date-start">' . __( 'Settings', 'nepali-date-converter' ) . '</a>';
-			array_push( $links, $settings_link );
+		public function add_settings_link( array $links ): array {
+			$settings_link = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( admin_url( 'options-general.php#ndc-post-date-start' ) ),
+				esc_html__( 'Settings', 'nepali-date-converter' )
+			);
+			$links[]       = $settings_link;
 			return $links;
-        }
+		}
 
 		/**
-		 * Callback function of admin_init
-		 * Admin =>Setting => General
+		 * Register plugin settings
 		 *
 		 * @since 2.0.0
-		 *
 		 */
-		public function ndc_setting_options() {
-
-			/*register a new section in the "general" page*/
+		public function register_settings(): void {
+			// Register settings section.
 			add_settings_section(
 				'ndc_post_date_section',
-				__( 'Nepali Post Date - Nepali Date Converter', 'nepali-date-converter'),
-				array($this,'settings_section_msg'),
+				__( 'Nepali Post Date - Nepali Date Converter', 'nepali-date-converter' ),
+				array( $this, 'render_settings_section' ),
 				'general'
 			);
-			/*Adding setting field*/
+
+			// Add nonce field.
+			add_settings_field(
+				'ndc_post_date_nonce',
+				'',
+				array( $this, 'render_nonce_field' ),
+				'general',
+				'ndc_post_date_section'
+			);
+
+			// Register settings fields.
 			add_settings_field(
 				'ndc_post_date_options[active]',
-				__( 'Activate Nepali Post Date On', 'nepali-date-converter'),
-				array($this, 'activate_callback' ),
+				__( 'Activate Nepali Post Date On', 'nepali-date-converter' ),
+				array( $this, 'render_active_field' ),
 				'general',
 				'ndc_post_date_section'
 			);
+
 			add_settings_field(
 				'ndc_post_date_options[date_format]',
-				__( 'Date Format', 'nepali-date-converter'),
-				array($this, 'date_format_callback' ),
+				__( 'Date Format', 'nepali-date-converter' ),
+				array( $this, 'render_date_format_field' ),
 				'general',
 				'ndc_post_date_section'
 			);
+
 			add_settings_field(
 				'ndc_post_date_options[force_format]',
-				__( 'Force Format', 'nepali-date-converter'),
-				array($this, 'force_format_callback' ),
+				__( 'Force Format', 'nepali-date-converter' ),
+				array( $this, 'render_force_format_field' ),
 				'general',
 				'ndc_post_date_section'
 			);
+
 			add_settings_field(
 				'ndc_post_date_options[human_time_diff]',
-				__( 'Activate Nepali Human Time Diff On', 'nepali-date-converter'),
-				array($this, 'human_time_diff_callback' ),
+				__( 'Activate Nepali Human Time Diff On', 'nepali-date-converter' ),
+				array( $this, 'render_human_time_diff_field' ),
 				'general',
 				'ndc_post_date_section'
 			);
+
 			add_settings_field(
 				'ndc_post_date_options[post_types]',
-				__( 'Post Types Support', 'nepali-date-converter'),
-				array($this, 'post_types_callback' ),
+				__( 'Post Types Support', 'nepali-date-converter' ),
+				array( $this, 'render_post_types_field' ),
 				'general',
 				'ndc_post_date_section'
 			);
-			/*Register Setting*/
+
+			// Register the setting.
 			register_setting(
 				'general',
 				'ndc_post_date_options',
 				array(
 					'type'              => 'array',
-					'description'       =>  __( 'All Options related to NDC Post Date', 'nepali-date-converter'),
-					'sanitize_callback' => array($this, 'sanitize_options' ),
-					'default' => $this->defaults,
+					'description'       => __( 'All Options related to NDC Post Date', 'nepali-date-converter' ),
+					'sanitize_callback' => array( $this, 'sanitize_options' ),
+					'default'           => self::DEFAULTS,
 				)
 			);
 		}
 
 		/**
-		 * Callback function of add_settings_section
-		 * Initialize from ndc_setting_options
+		 * Render settings section description
 		 *
 		 * @since 2.0.0
 		 */
-		public function settings_section_msg() {
-			echo "<p id='ndc-post-date-start'>";
-			esc_html_e( 'All Options related to NDC Post Date.', 'nepali-date-converter');
-			esc_html_e( " Does not work on following date format : 'S'", 'nepali-date-converter');
-			echo "</p>";
-			echo '<hr/>';
+		public function render_settings_section(): void {
+			echo '<p id="ndc-post-date-start">';
+			esc_html_e( 'All Options related to NDC Post Date.', 'nepali-date-converter' );
+			esc_html_e( " Does not work on following date format: 'S'", 'nepali-date-converter' );
+			echo '</p><hr/>';
 		}
 
 		/**
-		 * Callback function of add_settings_section
-		 * Initialize from add_settings_field
+		 * Render nonce field for settings form
 		 *
 		 * @since 2.0.0
 		 */
-		public function activate_callback() {
+		public function render_nonce_field(): void {
+			wp_nonce_field( 'ndc_post_date_options_nonce', 'ndc_post_date_nonce' );
+		}
+
+		/**
+		 * Render active field
+		 *
+		 * @since 2.0.0
+		 */
+		public function render_active_field(): void {
 			$active = $this->options['active'];
 			?>
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Date', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[active][date]">
-                    <input name="ndc_post_date_options[active][date]" type="checkbox" id="ndc_post_date_options[active][date]" value="1" <?php checked( '1', $active['date'] ); ?> />
-                    <div class="date-time-text">
-	                    <?php esc_html_e( 'Date', 'nepali-date-converter' ); ?>
-                    </div>
-                    <code><?php esc_html_e( 'It use get_the_date filter hook', 'nepali-date-converter' ); ?></code>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Date', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[active][date]">
+					<input name="ndc_post_date_options[active][date]" type="checkbox" id="ndc_post_date_options[active][date]" value="1" <?php checked( true, $active['date'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Date', 'nepali-date-converter' ); ?></span>
+					<code><?php esc_html_e( 'Uses get_the_date filter hook', 'nepali-date-converter' ); ?></code>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Time', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[active][time]">
-                    <input name="ndc_post_date_options[active][time]" type="checkbox" id="ndc_post_date_options[active][time]" value="1" <?php checked( '1', $active['time'] ); ?> />
-                    <div class="date-time-text">
-	                    <?php esc_html_e( 'Time', 'nepali-date-converter' ); ?>
-                    </div>
-                    <code><?php esc_html_e( 'It use get_the_time filter hook', 'nepali-date-converter' ); ?></code>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Time', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[active][time]">
+					<input name="ndc_post_date_options[active][time]" type="checkbox" id="ndc_post_date_options[active][time]" value="1" <?php checked( true, $active['time'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Time', 'nepali-date-converter' ); ?></span>
+					<code><?php esc_html_e( 'Uses get_the_time filter hook', 'nepali-date-converter' ); ?></code>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Date (Modified)', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[active][modified_date]">
-                    <input name="ndc_post_date_options[active][modified_date]" type="checkbox" id="ndc_post_date_options[active][modified_date]" value="1" <?php checked( '1', $active['modified_date'] ); ?> />
-                    <div class="date-time-text">
-	                    <?php esc_html_e( 'Date (Modified)', 'nepali-date-converter' ); ?>
-                    </div>
-                    <code><?php esc_html_e( 'It use get_the_modified_date filter hook', 'nepali-date-converter' ); ?></code>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Date (Modified)', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[active][modified_date]">
+					<input name="ndc_post_date_options[active][modified_date]" type="checkbox" id="ndc_post_date_options[active][modified_date]" value="1" <?php checked( true, $active['modified_date'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Date (Modified)', 'nepali-date-converter' ); ?></span>
+					<code><?php esc_html_e( 'Uses get_the_modified_date filter hook', 'nepali-date-converter' ); ?></code>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Time (Modified)', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[active][modified_time]">
-                    <input name="ndc_post_date_options[active][modified_time]" type="checkbox" id="ndc_post_date_options[active][modified_time]" value="1" <?php checked( '1', $active['modified_time'] ); ?> />
-                    <div class="date-time-text">
-	                    <?php esc_html_e( 'Time (Modified)', 'nepali-date-converter' ); ?>
-                    </div>
-                    <code><?php esc_html_e( 'It use get_the_modified_time filter hook', 'nepali-date-converter' ); ?></code>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Time (Modified)', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[active][modified_time]">
+					<input name="ndc_post_date_options[active][modified_time]" type="checkbox" id="ndc_post_date_options[active][modified_time]" value="1" <?php checked( true, $active['modified_time'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Time (Modified)', 'nepali-date-converter' ); ?></span>
+					<code><?php esc_html_e( 'Uses get_the_modified_time filter hook', 'nepali-date-converter' ); ?></code>
+				</label>
+			</fieldset>
 			<?php
 		}
 
 		/**
-		 * Callback function of add_settings_field
-		 * Initialize from ndc_setting_options
+		 * Render date format field
 		 *
 		 * @since 2.0.0
 		 */
-		public function date_format_callback(){
-
-			$date_formats = array_unique( apply_filters( 'ndc_date_formats', array( __( 'F j, Y' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
+		public function render_date_format_field(): void {
+			$date_formats         = array_unique( apply_filters( 'ndc_date_formats', array( __( 'F j, Y' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
+			$front_date_converter = ndc_frontend();
 			?>
-            <fieldset>
-                <legend class="screen-reader-text">
-                    <span><?php esc_html_e( 'Date Format', 'nepali-date-converter' ); ?></span>
-                </legend>
-				<?php
-				$front_date_converter = ndc_frontend();
-				foreach ( $date_formats as $format ) {
-					echo "\t<label><input type='radio' name='ndc_post_date_options[date_format][selected]' value='" . esc_attr( $format ) . "'";
-					checked( $format, $this->options['date_format']['selected'] );
-					echo ' /> <div class="date-time-text format-i18n">';
-					$front_date_converter->today_date(array(
-						'result_format'=> $format,
-						'disable_today_eng_date'=> true,
-					));
-					echo '</div><code>' . esc_html( $format ) . "</code></label><br />\n";
-				}
-				?>
-                <label>
-                    <input type="radio" id="ndc_post_date_options_custom_radio" name="ndc_post_date_options[date_format][selected]" value="ndc-date-format-custom" <?php checked( 'ndc-date-format-custom', $this->options['date_format']['selected'] ); ?>>
-                    <span class="date-time-text date-time-custom-text">
-                    <?php esc_html_e( 'Custom:', 'nepali-date-converter' ); ?>
-                    <span class="screen-reader-text"> <?php esc_html_e( 'enter a custom date format in the following field', 'nepali-date-converter' ); ?></span>
-                </span>
-                </label>
-                <label for="ndc_post_date_options[date_format][custom]" class="screen-reader-text">
+			<fieldset>
+				<legend class="screen-reader-text">
+					<span><?php esc_html_e( 'Date Format', 'nepali-date-converter' ); ?></span>
+				</legend>
+				<?php foreach ( $date_formats as $format ) : ?>
+					<label>
+						<input type="radio" name="ndc_post_date_options[date_format][selected]" value="<?php echo esc_attr( $format ); ?>" <?php checked( $format, $this->options['date_format']['selected'] ); ?> />
+						<span class="date-time-text format-i18n">
+							<?php
+							$front_date_converter->today_date(
+								array(
+									'result_format' => $format,
+									'disable_today_eng_date' => true,
+								)
+							);
+							?>
+						</span>
+						<code><?php echo esc_html( $format ); ?></code>
+					</label><br />
+				<?php endforeach; ?>
+
+				<label>
+					<input type="radio" id="ndc_post_date_options_custom_radio" name="ndc_post_date_options[date_format][selected]" value="ndc-date-format-custom" <?php checked( 'ndc-date-format-custom', $this->options['date_format']['selected'] ); ?> />
+					<span class="date-time-text date-time-custom-text">
+							<?php esc_html_e( 'Custom:', 'nepali-date-converter' ); ?>
+						<span class="screen-reader-text"><?php esc_html_e( 'enter a custom date format in the following field', 'nepali-date-converter' ); ?></span>
+					</span>
+				</label>
+				<label for="ndc_post_date_options[date_format][custom]" class="screen-reader-text">
 					<?php esc_html_e( 'Custom date format:', 'nepali-date-converter' ); ?>
-                </label>
-                <input type="text" name="ndc_post_date_options[date_format][custom]" id="ndc_post_date_options[date_format][custom]" value="<?php echo $this->options['date_format']['custom'];?>" class="small-text">
-                <br>
-                <strong><?php esc_html_e( 'Preview:', 'nepali-date-converter' ); ?></strong>
-                <div class="example">
-					<?php
-                    echo $this->get_current_nep_date($this->options['date_format']['selected'] !='ndc-date-format-custom'?$this->options['date_format']['selected']:$this->options['date_format']['custom'])['result'];
-					?>
-                </div>
-                <span class="spinner"></span>
-            </fieldset>
+				</label>
+				<input type="text" name="ndc_post_date_options[date_format][custom]" id="ndc_post_date_options[date_format][custom]" value="<?php echo esc_attr( $this->options['date_format']['custom'] ); ?>" class="small-text" />
+				<br />
+				<strong><?php esc_html_e( 'Preview:', 'nepali-date-converter' ); ?></strong>
+				<div class="example">
+					<?php echo esc_html( $this->get_nepali_date_preview( 'ndc-date-format-custom' !== $this->options['date_format']['selected'] ? $this->options['date_format']['selected'] : $this->options['date_format']['custom'] ) ); ?>
+				</div>
+				<span class="spinner"></span>
+			</fieldset>
 			<?php
 		}
 
 		/**
-		 * Callback function of add_settings_field
-		 * Initialize from ndc_setting_options
+		 * Render force format field
 		 *
 		 * @since 2.0.0
 		 */
-		public function force_format_callback(){
-		    ?>
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Force Format', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[force_format]">
-                    <input name="ndc_post_date_options[force_format]" type="checkbox" id="ndc_post_date_options[force_format]" value="1" <?php checked( '1', $this->options['force_format'] ); ?> />
-                    <div class="date-time-text">
-						<?php esc_html_e( 'Force Format', 'nepali-date-converter' ); ?>
-                    </div>
-	                <?php esc_html_e( 'When you check it, hard coded format will be ignored. eg:', 'nepali-date-converter' ); ?><code>get_the_date('F j, Y ')</code>
-                </label>
-            </fieldset>
-            <?php
+		public function render_force_format_field(): void {
+			?>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Force Format', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[force_format]">
+					<input name="ndc_post_date_options[force_format]" type="checkbox" id="ndc_post_date_options[force_format]" value="1" <?php checked( true, $this->options['force_format'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Force Format', 'nepali-date-converter' ); ?></span>
+					<?php esc_html_e( 'When enabled, hard coded formats will be ignored. Example:', 'nepali-date-converter' ); ?>
+					<code>get_the_date('F j, Y')</code>
+				</label>
+			</fieldset>
+			<?php
 		}
 
 		/**
-		 * Callback function of add_settings_section
-		 * Initialize from add_settings_field
-         *
+		 * Render human time diff field
+		 *
 		 * @since 2.0.1
 		 */
-		public function human_time_diff_callback() {
+		public function render_human_time_diff_field(): void {
 			$human_time_diff = $this->options['human_time_diff'];
 			?>
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Front Page', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[human_time_diff][front]">
-                    <input name="ndc_post_date_options[human_time_diff][front]" type="checkbox" id="ndc_post_date_options[human_time_diff][front]" value="1" <?php checked( '1', $human_time_diff['front'] ); ?> />
-                    <div class="date-time-text">
-						<?php esc_html_e( 'Front Page', 'nepali-date-converter' ); ?>
-                    </div>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Front Page', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[human_time_diff][front]">
+					<input name="ndc_post_date_options[human_time_diff][front]" type="checkbox" id="ndc_post_date_options[human_time_diff][front]" value="1" <?php checked( true, $human_time_diff['front'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Front Page', 'nepali-date-converter' ); ?></span>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Home - Blog Home', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[human_time_diff][home]">
-                    <input name="ndc_post_date_options[human_time_diff][home]" type="checkbox" id="ndc_post_date_options[human_time_diff][home]" value="1" <?php checked( '1', $human_time_diff['home'] ); ?> />
-                    <div class="date-time-text">
-						<?php esc_html_e( 'Home ( Blog Home )', 'nepali-date-converter' ); ?>
-                    </div>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Home - Blog Home', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[human_time_diff][home]">
+					<input name="ndc_post_date_options[human_time_diff][home]" type="checkbox" id="ndc_post_date_options[human_time_diff][home]" value="1" <?php checked( true, $human_time_diff['home'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Home (Blog Home)', 'nepali-date-converter' ); ?></span>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Archive', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[human_time_diff][archive]">
-                    <input name="ndc_post_date_options[human_time_diff][archive]" type="checkbox" id="ndc_post_date_options[human_time_diff][archive]" value="1" <?php checked( '1', $human_time_diff['archive'] ); ?> />
-                    <div class="date-time-text">
-						<?php esc_html_e( 'Archive', 'nepali-date-converter' ); ?>
-                    </div>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Archive', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[human_time_diff][archive]">
+					<input name="ndc_post_date_options[human_time_diff][archive]" type="checkbox" id="ndc_post_date_options[human_time_diff][archive]" value="1" <?php checked( true, $human_time_diff['archive'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Archive', 'nepali-date-converter' ); ?></span>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Single', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[human_time_diff][single]">
-                    <input name="ndc_post_date_options[human_time_diff][single]" type="checkbox" id="ndc_post_date_options[human_time_diff][single]" value="1" <?php checked( '1', $human_time_diff['single'] ); ?> />
-                    <div class="date-time-text">
-						<?php esc_html_e( 'Single', 'nepali-date-converter' ); ?>
-                    </div>
-                </label>
-            </fieldset>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Single', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[human_time_diff][single]">
+					<input name="ndc_post_date_options[human_time_diff][single]" type="checkbox" id="ndc_post_date_options[human_time_diff][single]" value="1" <?php checked( true, $human_time_diff['single'] ); ?> />
+					<span class="date-time-text"><?php esc_html_e( 'Single', 'nepali-date-converter' ); ?></span>
+				</label>
+			</fieldset>
 
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php esc_html_e( 'Suffix', 'nepali-date-converter' ); ?></span></legend>
-                <label for="ndc_post_date_options[human_time_diff][suffix]">
-                    <div class="date-time-text">
-		                <?php esc_html_e( 'Suffix', 'nepali-date-converter' ); ?>
-                    </div>
-                    <input name="ndc_post_date_options[human_time_diff][suffix]" type="text" id="ndc_post_date_options[human_time_diff][suffix]" value="<?php echo esc_attr($human_time_diff['suffix'] );?>" />
-                </label>
-	            <?php esc_html_e( 'Example', 'nepali-date-converter' ); ?><code>अगाडि, अघि</code>
-            </fieldset>
-            <br />
-            <strong><?php esc_html_e( 'Preview:', 'nepali-date-converter' ); ?></strong>
-            <div id="ndc-htd-example">
-                ३ सेकेन्ड <span><?php echo esc_html($human_time_diff['suffix'] );?></span>
-            </div>
+			<fieldset>
+				<legend class="screen-reader-text"><span><?php esc_html_e( 'Suffix', 'nepali-date-converter' ); ?></span></legend>
+				<label for="ndc_post_date_options[human_time_diff][suffix]">
+					<span class="date-time-text"><?php esc_html_e( 'Suffix', 'nepali-date-converter' ); ?></span>
+					<input name="ndc_post_date_options[human_time_diff][suffix]" type="text" id="ndc_post_date_options[human_time_diff][suffix]" value="<?php echo esc_attr( $human_time_diff['suffix'] ); ?>" />
+				</label>
+				<?php esc_html_e( 'Example', 'nepali-date-converter' ); ?>
+				<code>अगाडि, अघि</code>
+			</fieldset>
+			<br />
+			<strong><?php esc_html_e( 'Preview:', 'nepali-date-converter' ); ?></strong>
+			<div id="ndc-htd-example">
+				३ सेकेन्ड <span><?php echo esc_html( $human_time_diff['suffix'] ); ?></span>
+			</div>
 			<?php
 		}
 
 		/**
-		 * Callback function of add_settings_field
-		 * Initialize from ndc_setting_options
+		 * Render post types field
 		 *
 		 * @since 2.0.3
 		 */
-		public function post_types_callback(){
-			$post_types = ndc_get_post_types();
+		public function render_post_types_field(): void {
+			$post_types       = ndc_get_post_types();
 			$saved_post_types = $this->options['post_types'];
-			if( is_array( $post_types) && !empty( $post_types )){
-			    foreach ( $post_types as $post_type){
-			        ?>
-                    <fieldset>
-                        <legend class="screen-reader-text">
-                            <span><?php echo esc_html( $post_type['value']) ?></span>
-                        </legend>
-                        <label for="ndc_post_date_options[post_types][<?php echo esc_attr( $post_type['value']) ?>]">
-                            <input name="ndc_post_date_options[post_types][]" type="checkbox" id="ndc_post_date_options[human_time_diff][<?php echo esc_attr( $post_type['value']) ?>]" value="<?php echo esc_attr( $post_type['value']) ?>" <?php checked( true, in_array($post_type['value'], $saved_post_types)) ?> />
-                            <div class="date-time-text">
-	                            <?php echo esc_html( $post_type['label']) ?>
-                            </div>
-                        </label>
-                    </fieldset>
-                    <?php
-			    }
+
+			if ( empty( $post_types ) ) {
+				esc_html_e( 'No post types found!', 'nepali-date-converter' );
+				return;
 			}
 
-			?>
+			foreach ( $post_types as $post_type ) {
+				?>
+				<fieldset>
+					<legend class="screen-reader-text">
+						<span><?php echo esc_html( $post_type['value'] ); ?></span>
+					</legend>
+					<label for="ndc_post_date_options[post_types][<?php echo esc_attr( $post_type['value'] ); ?>]">
+						<input name="ndc_post_date_options[post_types][]" type="checkbox" id="ndc_post_date_options[post_types][<?php echo esc_attr( $post_type['value'] ); ?>]" value="<?php echo esc_attr( $post_type['value'] ); ?>" <?php checked( in_array( $post_type['value'], $saved_post_types, true ) ); ?> />
+						<span class="date-time-text"><?php echo esc_html( $post_type['label'] ); ?></span>
+					</label>
+				</fieldset>
+				<?php
+			}
+		}
 
+		/**
+		 * Sanitize plugin options
+		 *
+		 * @param array $options Input options.
+		 * @return array Sanitized options
+		 * @since 2.0.0
+		 */
+		public function sanitize_options( array $options ): array {
+			// Verify nonce.
+			if ( ! isset( $_POST['ndc_post_date_nonce'] ) ||
+			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ndc_post_date_nonce'] ) ), 'ndc_post_date_options_nonce' ) ) {
+				wp_die( esc_html__( 'Security check failed', 'nepali-date-converter' ) );
+			}
+
+			// Active settings.
+			$sanitized['active']['date']          = isset( $options['active']['date'] );
+			$sanitized['active']['time']          = isset( $options['active']['time'] );
+			$sanitized['active']['modified_date'] = isset( $options['active']['modified_date'] );
+			$sanitized['active']['modified_time'] = isset( $options['active']['modified_time'] );
+
+			// Date format.
+			$sanitized['date_format']['selected'] = isset( $options['date_format']['selected'] ) ? sanitize_text_field( $options['date_format']['selected'] ) : 'F j, Y';
+			$sanitized['date_format']['custom']   = isset( $options['date_format']['custom'] ) ? sanitize_text_field( $options['date_format']['custom'] ) : '';
+
+			// Force format.
+			$sanitized['force_format'] = isset( $options['force_format'] );
+
+			// Human time diff.
+			$sanitized['human_time_diff']['front']   = isset( $options['human_time_diff']['front'] );
+			$sanitized['human_time_diff']['home']    = isset( $options['human_time_diff']['home'] );
+			$sanitized['human_time_diff']['archive'] = isset( $options['human_time_diff']['archive'] );
+			$sanitized['human_time_diff']['single']  = isset( $options['human_time_diff']['single'] );
+			$sanitized['human_time_diff']['suffix']  = sanitize_text_field( $options['human_time_diff']['suffix'] );
+
+			// Post types.
+			$sanitized['post_types'] = isset( $options['post_types'] ) ? array_map( 'sanitize_key', $options['post_types'] ) : array();
+
+			return $sanitized;
+		}
+
+		/**
+		 * Add JavaScript for settings page with nonce security
+		 *
+		 * @since 2.0.0
+		 */
+		public function add_settings_js(): void {
+			$current_screen = get_current_screen();
+			if ( 'options-general' !== $current_screen->id ) {
+				return;
+			}
+
+			// Create a nonce for the AJAX request.
+			$ajax_nonce = wp_create_nonce( 'ndc_date_format_nonce' );
+			?>
+			<script type="text/javascript">
+				jQuery(document).ready(function($) {
+					var ndcNonce = '<?php echo esc_js( $ajax_nonce ); ?>';
+					
+					// Handle date format selection
+					$("input[name='ndc_post_date_options[date_format][selected]']").click(function() {
+						if ( "ndc_post_date_options_custom_radio" !== $(this).attr("id") ) {
+							$('input[name="ndc_post_date_options[date_format][custom]"]')
+								.val($(this).val())
+								.closest('fieldset')
+								.find('.example')
+								.text($(this).parent('label').children('.format-i18n').text());
+						}
+					});
+
+					// Handle custom date format input
+					$('input[name="ndc_post_date_options[date_format][custom]"]').on('click input', function() {
+						$('#ndc_post_date_options_custom_radio').prop('checked', true);
+
+						var format = $(this),
+							fieldset = format.closest('fieldset'),
+							example = fieldset.find('.example'),
+							spinner = fieldset.find('.spinner');
+
+						// Debounce the event callback while users are typing
+						clearTimeout($.data(this, 'timer'));
+						$(this).data('timer', setTimeout(function() {
+							if (format.val()) {
+								spinner.addClass('is-active');
+								$.post(ajaxurl, {
+									action: 'ndc_date_format',
+									date: format.val(),
+									_ajax_nonce: ndcNonce
+								}, function(d) {
+									spinner.removeClass('is-active');
+									example.html(d);
+								}).fail(function(xhr) {
+									spinner.removeClass('is-active');
+									example.text('Error: ' + xhr.responseText);
+								});
+							}
+						}, 500));
+					});
+
+					// Update human time diff suffix preview
+					$('input[name="ndc_post_date_options[human_time_diff][suffix]"]').on('click input', function() {
+						$('#ndc-htd-example').children('span').text($(this).val());
+					});
+				});
+			</script>
 			<?php
 		}
 
 		/**
-		 * Callback function of register_setting
-		 * Initialize from ndc_setting_options
+		 * Get Nepali date preview for a given format with error handling.
+		 *
+		 * @param string $format Date format.
+		 * @return string Formatted Nepali date.
+		 * @throws Exception If the date conversion result is invalid.
+		 * @since 2.0.0
+		 */
+		private function get_nepali_date_preview( string $format ): string {
+			try {
+				$timezone   = new DateTimeZone( 'Asia/Kathmandu' );
+				$datetime   = new DateTime( 'now', $timezone );
+				$date_parts = explode( '-', $datetime->format( 'Y-m-d-H-i-s' ) );
+
+				$nepali_date = ndc_eng_to_nep_date(
+					array(
+						'year'  => (int) $date_parts[0],
+						'month' => (int) $date_parts[1],
+						'day'   => (int) $date_parts[2],
+						'hour'  => (int) $date_parts[3],
+						'min'   => (int) $date_parts[4],
+						'sec'   => (int) $date_parts[5],
+					),
+					'nep_char',
+					$format
+				);
+
+				if ( ! isset( $nepali_date['result'] ) ) {
+					throw new Exception( 'Invalid date conversion result' );
+				}
+
+				return $nepali_date['result'];
+			} catch ( Exception $e ) {
+				return __( 'Error generating date preview', 'nepali-date-converter' );
+			}
+		}
+
+		/**
+		 * AJAX handler for date format preview with nonce verification
 		 *
 		 * @since 2.0.0
 		 */
-		public function sanitize_options( $options ) {
+		public function ajax_get_date_format(): void {
+			// Verify nonce first.
+			check_ajax_referer( 'ndc_date_format_nonce', '_ajax_nonce' );
 
-			/*Active Setting Radio*/
-			$options['active']['date'] = (isset( $options['active']['date'] ) );
-			$options['active']['time'] = (isset( $options['active']['time'] ) );
-			$options['active']['modified_date'] = (isset( $options['active']['modified_date'] ) );
-			$options['active']['modified_time'] = (isset( $options['active']['modified_time'] ) );
+			if ( ! isset( $_POST['date'] ) ) {
+				wp_send_json_error( esc_html__( 'Date format not provided', 'nepali-date-converter' ) );
+				wp_die();
+			}
 
-			/*Date Format*/
-			$options['date_format']['selected'] = isset( $options['date_format']['selected'] )?sanitize_text_field($options['date_format']['selected']):'2';
-			$options['date_format']['custom'] = isset( $options['date_format']['custom'] )?sanitize_text_field($options['date_format']['custom']):'';
+			// Sanitize the input.
+			$format = sanitize_text_field( wp_unslash( $_POST['date'] ) );
 
-			/*Force Format*/
-			$options['force_format'] = (isset( $options['force_format'] ) );
+			if ( empty( $format ) ) {
+				wp_send_json_error( esc_html__( 'Invalid date format', 'nepali-date-converter' ) );
+				wp_die();
+			}
 
-			/*Human time different*/
-			$options['human_time_diff']['front'] = (isset( $options['human_time_diff']['front'] ) );
-			$options['human_time_diff']['home'] = (isset( $options['human_time_diff']['home'] ) );
-			$options['human_time_diff']['archive'] = (isset( $options['human_time_diff']['archive'] ) );
-			$options['human_time_diff']['single'] = (isset( $options['human_time_diff']['single'] ) );
-			$options['human_time_diff']['suffix'] = sanitize_text_field($options['human_time_diff']['suffix']);
-
-			/*Post Type Support*/
-			$options['post_types'] = isset( $options['post_types'] )?array_map("sanitize_key",$options['post_types']):array();
-
-			return $options;
+			wp_send_json_success( $this->get_nepali_date_preview( $format ) );
+			wp_die();
 		}
 
 		/**
-		 * Callback function of register_setting
-		 * Initialize from ndc_setting_options
-		 * Copied and modified from wp-admin\includes\options.php function options_general_add_js
+		 * Initialize the plugin functionality
 		 *
 		 * @since 2.0.0
 		 */
-		function options_general_add_js() {
-			$currentScreen = get_current_screen();
-			if( $currentScreen->id !== "options-general" ) {
+		public function init(): void {
+			// Load options for both backend and frontend.
+			$db_options    = get_option( 'ndc_post_date_options', self::DEFAULTS );
+			$this->options = wp_parse_args( $db_options, self::DEFAULTS );
+			$this->options = apply_filters( 'ndc_post_date_options', $this->options );
+
+			// Skip frontend hooks in admin.
+			if ( is_admin() ) {
 				return;
 			}
-			?>
-            <script type="text/javascript">
-                jQuery(document).ready(function($){
-                    $("input[name='ndc_post_date_options[date_format][selected]']").click(function(){
-                        if ( "ndc_post_date_options_custom_radio" !== $(this).attr("id") ){
-                            $( 'input[name="ndc_post_date_options[date_format][custom]"]' ).val( $( this ).val() ).closest( 'fieldset' ).find( '.example' ).text( $( this ).parent( 'label' ).children( '.format-i18n' ).text() );
-                        }
-                    });
-                    $( 'input[name="ndc_post_date_options[date_format][custom]"]' ).on( 'click input', function() {
-                        $( '#ndc_post_date_options_custom_radio' ).prop( 'checked', true );
 
-                        var format = $( this ),
-                            fieldset = format.closest( 'fieldset' ),
-                            example = fieldset.find( '.example' ),
-                            spinner = fieldset.find( '.spinner' );
+			// Set up filters based on active options.
+			$filters = array();
+			if ( $this->options['active']['date'] ) {
+				$filters[] = 'get_the_date';
+			}
+			if ( $this->options['active']['time'] ) {
+				$filters[] = 'get_the_time';
+			}
+			if ( $this->options['active']['modified_date'] ) {
+				$filters[] = 'get_the_modified_date';
+			}
+			if ( $this->options['active']['modified_time'] ) {
+				$filters[] = 'get_the_modified_time';
+			}
 
-                        // Debounce the event callback while users are typing.
-                        clearTimeout( $.data( this, 'timer' ) );
-                        $( this ).data( 'timer', setTimeout( function() {
-                            // If custom date is not empty.
-                            if ( format.val() ) {
-                                spinner.addClass( 'is-active' );
-                                $.post( ajaxurl, {
-                                    action: 'ndc_date_format',
-                                    date 	: format.val()
-                                }, function( d ) { spinner.removeClass( 'is-active' ); example.html( d ); } );
-                            }
-                        }, 500 ) );
-                    });
+			$filters = apply_filters( 'ndc_post_date_filters', $filters );
 
-                    $( 'input[name="ndc_post_date_options[human_time_diff][suffix]"]' ).on( 'click input', function() {
-                        $('#ndc-htd-example').children('span').text($( this ).val())
-                    });
-                });
-            </script>
-			<?php
+			foreach ( $filters as $filter ) {
+				add_filter( $filter, array( $this, 'convert_post_date_to_nepali' ), 10, 3 );
+			}
 		}
 
 		/**
-		 * Callback function of wp_ajax_ndc_date_format
-		 * @param  string $format
-         *
+		 * Convert post date to Nepali date
+		 *
+		 * @param string  $the_date Original date string.
+		 * @param string  $format Date format.
+		 * @param WP_Post $post Post object.
+		 * @return string Converted Nepali date.
 		 * @since 2.0.0
 		 */
-		function get_current_nep_date($format){
-			$timezone = new DateTimeZone( 'Asia/Kathmandu' );
-			$datetime = new DateTime( 'now', $timezone );
-
-			$post_date_ymd = $datetime->format( 'Y-m-d-H-i-s' );
-			$post_date_ymds = explode('-', $post_date_ymd );
-
-			$today_nepali_date_data = ndc_eng_to_nep_date(array(
-				'year' => (int) $post_date_ymds[0],
-				'month' => (int) $post_date_ymds[1],
-				'day' => (int) $post_date_ymds[2],
-				'hour' => (int) $post_date_ymds[3],
-				'min' => (int) $post_date_ymds[4],
-				'sec' => (int) $post_date_ymds[5]
-			),'nep_char',$format);
-			return $today_nepali_date_data;
-		}
-
-		function get_date_format(){
-		    echo  $this->get_current_nep_date(wp_unslash( $_POST['date'] ))['result'];
-			exit;
-		}
-
-		/**
-		 * Callback function of init
-         * For Frontend
-		 * $this->options is for both frontend and backend
-         *
-		 * @since 2.0.0
-		 */
-		function init_ndc_post_date(){
-			/*Use both admin and frontend*/
-            $db_options = get_option('ndc_post_date_options', $this->defaults);
-            $db_options = array_merge($this->defaults, $db_options);
-			$this->options = apply_filters( 'ndc_post_date_options', $db_options);
-
-			/*return if in admin*/
-			if( is_admin()){
-				return;
+		public function convert_post_date_to_nepali( string $the_date, string $format, WP_Post $post ): string {
+			// Skip if post type not supported.
+			if ( ! in_array( $post->post_type, $this->options['post_types'], true ) ) {
+				return $the_date;
 			}
-			/*Preparing Filter list*/
-			$filter_list = array();
 
-			if ($this->options['active']['date']):
-				$filter_list []= 'get_the_date';
-			endif;
+			// Determine format to use.
+			$result_format = $format && ! $this->options['force_format']
+			? $format
+			: ( 'ndc-date-format-custom' !== $this->options['date_format']['selected']
+				? $this->options['date_format']['selected']
+				: $this->options['date_format']['custom'] );
 
-			if ($this->options['active']['time']) :
-				$filter_list []= 'get_the_time';
-			endif;
+			// Handle Unix timestamp format.
+			if ( 'U' === $result_format || 'U' === $format ) {
+				return strtr( $the_date, ndc_nepali_calendar()->eng_nep_num );
+			}
 
-			if ( $this->options['active']['modified_date'] ) :
-				$filter_list []= 'get_the_modified_date';
-			endif;
+			// Handle human time diff if enabled.
+			$post_timestamp = strtotime( $post->post_date );
+			if ( $this->should_use_human_time_diff() ) {
+				$current_local_timestamp = strtotime( get_date_from_gmt( gmdate( 'Y-m-d H:i:s' ), 'Y-m-d H:i:s' ) );
+				return ndc_human_time_diff( $post_timestamp, $current_local_timestamp ) . ' ' . esc_html( $this->options['human_time_diff']['suffix'] );
+			}
 
-			if ( $this->options['active']['modified_time'] ) :
-				$filter_list []= 'get_the_modified_time';
-			endif;
+			// Convert to Nepali date.
+			$date_parts = explode( '-', wp_date( 'Y-m-d-H-i-s', $post_timestamp ) );
 
-			$post_date_filters = apply_filters(
-				'ndc_post_date_filters',
-				$filter_list
+			$nepali_date = ndc_eng_to_nep_date(
+				array(
+					'year'  => (int) $date_parts[0],
+					'month' => (int) $date_parts[1],
+					'day'   => (int) $date_parts[2],
+					'hour'  => (int) $date_parts[3],
+					'min'   => (int) $date_parts[4],
+					'sec'   => (int) $date_parts[5],
+				),
+				'nep_char',
+				$result_format
 			);
-			if( !$post_date_filters){
-				return;
-			}
-			foreach ( $post_date_filters as $filter ) :
-				add_filter( $filter, array( $this, 'post_date_to_nepali' ), 10, 3);
-			endforeach;
+
+			return $nepali_date['result'];
 		}
 
 		/**
-		 * Callback function from $filter
-		 * For Frontend Only
-         *
-		 * Initialize from init_ndc_post_date
-         * from various filters follows
-         * get_the_date
-         * get_the_time
-         * get_the_modified_date
-         * get_the_modified_time
+		 * Check if human time diff should be used
 		 *
+		 * @return bool Whether to use human time diff
 		 * @since 2.0.0
 		 */
-
-		public function post_date_to_nepali(  $the_date, $format, $post  ){
-
-			if( $format && !$this->options['force_format'] ){
-				$result_format = $format;
-			}
-			else{
-				$result_format = $this->options['date_format']['selected'] !='ndc-date-format-custom'?$this->options['date_format']['selected']:$this->options['date_format']['custom'];
-			}
-
-			/*Post Type Check*/
-            if( !in_array($post->post_type, $this->options['post_types'])){
-                return $the_date;
-            }
-
-			/*for format U
-			just change num to nepali and return*/
-            if( $result_format == 'U' || $format == 'U'){
-	            return strtr( $the_date, ndc_nepali_calendar()->eng_nep_num );
-            }
-
-			/*Human time different*/
-            $ndc_post_date = strtotime( $post->post_date );
-			if ((is_front_page() && $this->options['human_time_diff']['front']) ||
-                (is_home() && $this->options['human_time_diff']['home']) ||
-                (is_archive() && $this->options['human_time_diff']['archive']) ||
-                (is_single() && $this->options['human_time_diff']['single'])
-            ){
-				return ndc_human_time_diff( $ndc_post_date, current_time('timestamp') ) .' '.esc_html($this->options['human_time_diff']['suffix']);
-			}
-
-			/*change to YMD*/
-			$post_date_ymd = date('Y-m-d-H-i-s', $ndc_post_date);
-			$post_date_ymds = explode('-', $post_date_ymd );
-
-			/*define characters*/
-			$nepali_date_lang = 'nep_char';
-
-			$today_nepali_date_data = ndc_eng_to_nep_date(array(
-				'year' => (int) $post_date_ymds[0],
-				'month' => (int) $post_date_ymds[1],
-				'day' => (int) $post_date_ymds[2],
-				'hour' => (int) $post_date_ymds[3],
-				'min' => (int) $post_date_ymds[4],
-				'sec' => (int) $post_date_ymds[5]
-            ),$nepali_date_lang,$result_format );
-
-			return $today_nepali_date_data['result'];
+		private function should_use_human_time_diff(): bool {
+			$htd = $this->options['human_time_diff'];
+			return ( is_front_page() && $htd['front'] ) ||
+				( is_home() && $htd['home'] ) ||
+				( is_archive() && $htd['archive'] ) ||
+				( is_single() && $htd['single'] );
 		}
 	}
 }
+
 
 /**
- * Begins execution of the module
- * NDC_Post_Date
+ * Get the NDC_Post_Date instance
  *
- * @since    2.0.0
+ * @return NDC_Post_Date
+ * @since 2.0.0
  */
-if( !function_exists( 'ndc_post_date')){
-
-	function ndc_post_date() {
-
-		return NDC_Post_Date::get_instance();
-	}
-	ndc_post_date()->run();
+function ndc_post_date(): NDC_Post_Date {//phpcs:ignore
+	return NDC_Post_Date::get_instance();
 }
+
+// Initialize the plugin.
+ndc_post_date()->run();
