@@ -459,18 +459,18 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 			if ( $year < $english_range['first'] || $year > $english_range['last'] ) {
 				return sprintf(
 				// translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali wp_date range.
-					__( 'Supported only between %1$d-%2$d', 'nepali-wp_date-converter' ),
+					__( 'Supported only between %1$d-%2$d', 'nepali-date-converter' ),
 					$english_range['first'],
 					$english_range['last']
 				);
 			}
 
 			if ( $month < 1 || $month > 12 ) {
-				return __( 'Error! month value can be between 1-12 only', 'nepali-wp_date-converter' );
+				return __( 'Error! month value can be between 1-12 only', 'nepali-date-converter' );
 			}
 
 			if ( $day < 1 || $day > 31 ) {
-				return __( 'Error! day value can be between 1-31 only', 'nepali-wp_date-converter' );
+				return __( 'Error! day value can be between 1-31 only', 'nepali-date-converter' );
 			}
 
 			return true;
@@ -491,18 +491,18 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 			if ( $year < $nepali_range['first'] || $year > $nepali_range['last'] ) {
 				return sprintf(
 				// translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali wp_date range.
-					__( 'Supported only between %1$d-%2$d', 'nepali-wp_date-converter' ),
+					__( 'Supported only between %1$d-%2$d', 'nepali-date-converter' ),
 					$nepali_range['first'],
 					$nepali_range['last']
 				);
 			}
 
 			if ( $month < 1 || $month > 12 ) {
-				return __( 'Error! month value can be between 1-12 only', 'nepali-wp_date-converter' );
+				return __( 'Error! month value can be between 1-12 only', 'nepali-date-converter' );
 			}
 
 			if ( $day < 1 || $day > 32 ) {
-				return __( 'Error! day value can be between 1-32 only', 'nepali-wp_date-converter' );
+				return __( 'Error! day value can be between 1-32 only', 'nepali-date-converter' );
 			}
 
 			return true;

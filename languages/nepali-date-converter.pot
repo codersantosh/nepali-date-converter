@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nepali Date Converter 3.0.0\n"
+"Project-Id-Version: Nepali Date Converter 3.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nepali-date-converter\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-28T17:37:04+00:00\n"
+"POT-Creation-Date: 2025-03-28T18:35:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: nepali-date-converter\n"
@@ -58,13 +58,13 @@ msgid "Activate Nepali Post Date On"
 msgstr ""
 
 #: inc/class/ndc-post-date.php:142
-#: inc/class/ndc-post-date.php:263
+#: inc/class/ndc-post-date.php:264
 msgid "Date Format"
 msgstr ""
 
 #: inc/class/ndc-post-date.php:150
-#: inc/class/ndc-post-date.php:311
-#: inc/class/ndc-post-date.php:314
+#: inc/class/ndc-post-date.php:312
+#: inc/class/ndc-post-date.php:315
 msgid "Force Format"
 msgstr ""
 
@@ -127,77 +127,96 @@ msgstr ""
 msgid "Uses get_the_modified_time filter hook"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:285
+#: inc/class/ndc-post-date.php:286
 msgid "Custom:"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:286
+#: inc/class/ndc-post-date.php:287
 msgid "enter a custom date format in the following field"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:290
+#: inc/class/ndc-post-date.php:291
 msgid "Custom date format:"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:294
-#: inc/class/ndc-post-date.php:372
+#: inc/class/ndc-post-date.php:295
+#: inc/class/ndc-post-date.php:373
 msgid "Preview:"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:315
+#: inc/class/ndc-post-date.php:316
 msgid "When enabled, hard coded formats will be ignored. Example:"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:331
-#: inc/class/ndc-post-date.php:334
+#: inc/class/ndc-post-date.php:332
+#: inc/class/ndc-post-date.php:335
 msgid "Front Page"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:339
+#: inc/class/ndc-post-date.php:340
 msgid "Home - Blog Home"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:342
+#: inc/class/ndc-post-date.php:343
 msgid "Home (Blog Home)"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:347
-#: inc/class/ndc-post-date.php:350
+#: inc/class/ndc-post-date.php:348
+#: inc/class/ndc-post-date.php:351
 msgid "Archive"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:355
-#: inc/class/ndc-post-date.php:358
+#: inc/class/ndc-post-date.php:356
+#: inc/class/ndc-post-date.php:359
 msgid "Single"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:363
-#: inc/class/ndc-post-date.php:365
+#: inc/class/ndc-post-date.php:364
+#: inc/class/ndc-post-date.php:366
 msgid "Suffix"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:368
+#: inc/class/ndc-post-date.php:369
 msgid "Example"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:389
+#: inc/class/ndc-post-date.php:390
 msgid "No post types found!"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:419
+#: inc/class/ndc-post-date.php:420
 msgid "Security check failed"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:548
+#: inc/class/ndc-post-date.php:549
 msgid "Error generating date preview"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:562
+#: inc/class/ndc-post-date.php:563
 msgid "Date format not provided"
 msgstr ""
 
-#: inc/class/ndc-post-date.php:570
+#: inc/class/ndc-post-date.php:571
 msgid "Invalid date format"
+msgstr ""
+
+#. translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali wp_date range.
+#: inc/frameworks/nepali-calendar/nepali-calendar.php:462
+#: inc/frameworks/nepali-calendar/nepali-calendar.php:494
+msgid "Supported only between %1$d-%2$d"
+msgstr ""
+
+#: inc/frameworks/nepali-calendar/nepali-calendar.php:469
+#: inc/frameworks/nepali-calendar/nepali-calendar.php:501
+msgid "Error! month value can be between 1-12 only"
+msgstr ""
+
+#: inc/frameworks/nepali-calendar/nepali-calendar.php:473
+msgid "Error! day value can be between 1-31 only"
+msgstr ""
+
+#: inc/frameworks/nepali-calendar/nepali-calendar.php:505
+msgid "Error! day value can be between 1-32 only"
 msgstr ""
 
 #. translators: %s example array..
