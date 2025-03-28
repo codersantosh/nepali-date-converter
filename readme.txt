@@ -1,143 +1,131 @@
 === Nepali Date Converter ===
-Contributors: addonspress, acmeit, codersantosh
-Donate link: https://www.addonspress.com/
-Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nepali  date converter, Nepali to English date converter
-Requires at least: 4.9
-Tested up to: 6.7
-Stable tag: 2.0.8
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Contributors: addonspress, acmeit, codersantosh  
+Donate link: https://www.addonspress.com/  
+Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nepali date converter, Nepali to English date converter  
+Requires at least: 4.9  
+Tested up to: 6.7  
+Requires PHP: 7.2  
+Stable tag: 3.0.0  
+License: GPLv2 or later  
+License URI: http://www.gnu.org/licenses/gpl-2.0.html  
 
-Effortlessly Convert between English and Nepali Dates, Including Converting Post Dates to Nepali Dates. Also supports displaying today's date.
+Convert English dates to Nepali and vice versa, including WordPress post dates. Includes widgets, shortcodes, and custom functions.
 
 == Description ==
 
-If you're looking for a sleek and functional WordPress theme that integrates seamlessly with a Nepali date converter plugin, 
-check out this [free WordPress theme: CosmosWP](https://wordpress.org/themes/cosmoswp/). It comes with a [demo showcasing the Nepali date converter](https://demo.cosmoswp.com/demo-99/) plugin in action.
+Nepali Date Converter makes it easy to convert dates between English (Gregorian) and Nepali (Bikram Sambat) formats. Whether you're building a Nepali-language WordPress site or just need to display today’s Nepali date, this plugin has you covered.
 
-Newly Added Feature: Convert Post Dates to Nepali Dates. Access the setting under Admin => Setting => General.
+Includes:
+- Post Date to Nepali conversion
+- Today’s Nepali date display
+- Nepali human time differences (e.g., "३ सेकेन्ड अगाडि")
+- Shortcodes and widgets
+- Custom functions for developers
 
-Nepali Date Converter is a plugin with widgets and shortcodes which convert Nepali Dates to English Date and English Date to Nepali Date.
-You can also show either today's Nepali date, today's English date or both.
-Now you can also change the Post Date to Nepali Date.
+Fully rewritten for version 3.0.0, this release modernizes the plugin from the ground up, improves accuracy, and ensures better compatibility.
 
-== Main Features ==
+== Key Features ==
 
-* Show Post Date to Nepali
-* Nepali Human Time Diff (Eg: ३ सेकेन्ड अगाडि)
-* Widget: Nepali Date Converter
-* Widget: Nepali Today Date
-* Shortcode: Nepali Date Converter=> [nepali-date-converter]
-* Shortcode: Nepali Today Date=> [ndc-today-date]
-* Various Custom function to convert English Date to Nepali and Nepali Date to English
-
-== Show Post Date to Nepali ==
-
-From the Dashboard go to `Setting => General` and scroll to the bottom
-
-== Available Widgets ==
-
-You will find the following widgets with advanced options:
-
-* NDC: Nepali Date Converter
-* NDC: Today Date
-
-== Available Shortcodes ==
-
-You can use the following shortcodes either to display Nepali Date Converter or Today Date anywhere in the posts or pages:
-
-* Use `[nepali-date-converter]` to show Nepali Date Converter
-* Use `[ndc-today-date]` to show Today Date
-
-Again the shortcode `[nepali-date-converter]` comes with the following options:
-
-* 'before' => Use anything to show before Nepali Date Converter eg: `<div class="ndc-wrapper">`,
-* 'after' => Use anything to show after Nepali Date Converter eg: `</div>`,
-* 'before_title' => Use anything to show before Title eg: `<div class="ndc-title">`,
-* 'after_title' => Use anything to show after title eg: `</div>`,
-* 'title' => Write something for the title `Nepali Date Converter`,
-* 'disable_ndc_convert_nep_to_eng' => Write `1` to disable converting Nepali Date to English Date,
-* 'disable_ndc_convert_eng_to_nep' =>  Write `1` to disable converting English Date to Nepali Date,
-* 'nep_to_eng_button_text' => Write text for button for Nepali to English eg: `Nepali to English`,
-* 'eng_to_nep_button_text' => Write text for button for Nepali to English eg: `English to Nepali`,
-* 'result_format' => You can use any date format for the result display in the front end. See date format here [Formatting Date](https://codex.wordpress.org/Formatting_Date_and_Time). eg: 'D, F j, Y'.
-Please note that "S The English suffix for the day of the month" is not supported for version 1.0,
-* 'nepali_date_lang' => By default Nepali date language is `nep_char` that means date display like this `शुक्रबार, अशोज ८, २०७२`,
-You can also use 'eng_char' to display dates like this `Sukrabar, Ashwin 8, 2072`
-* Example shortcodes: `[nepali-date-converter]`, `[nepali-date-converter title="Nepali date"]`, `[nepali-date-converter title="Nepali date" result_format ="l, F j, Y"]`
-
-Please visit [Nepali Date Converter](https://www.addonspress.com/wordpress-plugins/nepali-date-converter/) for more information about another shortcode `[ndc-today-date]` and for all available functions.
+* 🔁 Convert English ↔ Nepali dates
+* 🗓️ Show Nepali date for post publish dates
+* ⏳ Nepali human time differences (e.g., ३ मिनेट अगाडि)
+* 🧩 Widgets: Date Converter and Today’s Date
+* 🧪 Shortcodes: `[nepali-date-converter]`, `[ndc-today-date]`
+* 🔧 Developer functions: `ndc_eng_to_nep_date`, `ndc_nep_to_eng_date`, and more
+* 📅 Supports Bikram Sambat years 2000 to 2099 BS
+* 🔒 Security improvements and code hardening
 
 == Installation ==
 
-1. Login to the admin panel, Go to Plugins => Add New.
-2. Search for "Nepali Date Converter" and install it.
-3. Once you install it, activate it
-4. Go to Appearance => Widgets, NDC: Nepali Date Converter and NDC: Today Date is waiting for you :) And also available shortcodes and functions.
+**Automatic Installation:**
+1. Go to Plugins → Add New
+2. Search for "Nepali Date Converter"
+3. Click Install and then Activate
 
-Or
+**Manual Installation:**
+1. Upload the `nepali-date-converter` folder to `/wp-content/plugins/`
+2. Activate via the Plugins menu
 
-1. Put the plug-in folder `nepali-date-converter` into [wordpress_dir]/wp-content/plugins/
-2. Go into the WordPress admin interface and activate the plugin
-3. Go to Appearance => Widgets, NDC: Nepali Date Converter and NDC: Today Date is waiting for you :) And also available shortcodes and functions.
+After activation:
+- Go to Appearance → Widgets to use NDC widgets
+- Use shortcodes in posts/pages as needed
+- To enable Nepali Post Date, go to Settings → General and scroll to the bottom
 
-Have fun!!!
+== Shortcodes ==
+
+### 1. `[nepali-date-converter]`
+Display a Nepali date converter form.
+
+**Attributes:**
+- `title`: Custom title (default: Nepali Date Converter)
+- `result_format`: Format for output (e.g., `l, F j, Y`)
+- `disable_ndc_convert_eng_to_nep`: `1` to disable English to Nepali conversion
+- `disable_ndc_convert_nep_to_eng`: `1` to disable Nepali to English conversion
+- `nepali_date_lang`: `nep_char` (e.g., `शुक्रबार, अशोज ८, २०७२`) or `eng_char`
+
+**Examples:**
+```php
+[nepali-date-converter]
+[nepali-date-converter title="Nepali Date"]
+[nepali-date-converter title="Nepali date" result_format="l, F j, Y"]
+```
+
+### 2. `[ndc-today-date]`
+Displays today’s Nepali date.
+
+== Widgets ==
+
+- **NDC: Nepali Date Converter** – Date converter widget
+- **NDC: Today Date** – Show today’s Nepali date
+
+== Developer Functions ==
+
+- `ndc_eng_to_nep_date()` – Convert English to Nepali
+- `ndc_convert_eng_to_nep()` – Convert using formatted string
+- `ndc_nep_to_eng_date()` – Convert Nepali to English
+- `ndc_convert_nep_to_eng()` – Convert using formatted string
+
+Use in code:
+```php
+echo do_shortcode('[nepali-date-converter]');
+echo do_shortcode('[ndc-today-date]');
+```
 
 == Frequently Asked Questions ==
 
-= What does this plugin do? =
+= What’s new in version 3.0.0? =
+- Full plugin rewrite using modern PHP practices
+- Deprecated functions removed
+- Date conversion engine improved
+- Date range supported: 2000 BS to 2099 BS
+- Minimum PHP version now required: 7.2+
+- Security improvements
 
-* You can show the Post Date to Nepali
-* Convert Nepali Date to English Date and English Date to Nepali Date.
-* You can also show either today's Nepali date today, the English date or both.
-* Custom functions are available
+= Can I show post publish dates in Nepali? =
+Yes, enable it from Settings → General (scroll to the bottom).
 
-= What are date formats that I can use with this plugin? =
-
-Please note that "S The English suffix for the day of the month" is not supported for version 1.0. Other than that you can use any date format [Formatting Date](https://codex.wordpress.org/Formatting_Date_and_Time).
-
-= How can I display the Nepali Date Converter or Today Date in any post/page content?  =
-
-You can use the following shortcodes either to display Nepali Date Converter or Today Date anywhere in the posts or pages:
-
-* Use `[nepali-date-converter]` to show Nepali Date Converter
-* Use `[ndc-today-date]` to show Today Date
-
-= Are there any functions available in this   =
-
-Yes, you can use the following functions
-
-* ndc_eng_to_nep_date
-* ndc_convert_eng_to_nep
-* ndc_nep_to_eng_date
-* ndc_convert_nep_to_eng
-
-For showing the whole Nepali date converter or today's Nepali date you can use the do_shortcode function
-
-* `echo do_shortcode('[nepali-date-converter]')`
-* `echo do_shortcode('[ndc-today-date]')`
-
-= Still have some questions? =
-
-Please use support [support forum](https://wordpress.org/support/plugin/nepali-date-converter/)
+= Can I use this in theme or plugin development? =
+Absolutely. Use the helper functions or shortcodes as needed.
 
 == Screenshots ==
 
-1. Nepali Post Date
-
-2. Nepali Date Converter Widget
-
-3. Today's Date Widget
-
-4. Widgets area
-
-5. Nepali Date Converter Widget Frontend
-
-6. Today's Date Widget Frontend
-
-7. Frontend Display form shortcode and widget
+1. Post date in Nepali
+2. Date converter widget (backend)
+3. Today’s date widget (backend)
+4. Widget settings
+5. Date converter frontend
+6. Today’s date frontend
+7. Combined output via shortcode
 
 == Changelog ==
+
+= 3.0.0 - 2025-03-28 =
+* Rewrite: Complete plugin rewrite with modern codebase
+* Removed: Deprecated and legacy functions
+* Improved: Date conversion logic and accuracy
+* Supported: Dates from 2000 to 2099 BS
+* Security: Code hardening and data sanitization
+* Requirement: PHP 7.2+ minimum
 
 = 2.0.8 - 2024-10-31 =
 * Added: WordPress latest compatibility
