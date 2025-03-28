@@ -255,7 +255,8 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 		 * @since 2.0.0
 		 */
 		public function render_date_format_field(): void {
-			$date_formats         = array_unique( apply_filters( 'ndc_date_formats', array( __( 'F j, Y' ), 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
+			$date_formats = array_unique( apply_filters( 'ndc_date_formats', array( 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y' ) ) );
+
 			$front_date_converter = ndc_frontend();
 			?>
 			<fieldset>

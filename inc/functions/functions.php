@@ -138,49 +138,41 @@ if ( ! function_exists( 'ndc_human_time_diff' ) ) {
 
 		switch ( true ) {
 			case $diff < MINUTE_IN_SECONDS:
-				$secs = max( $diff, 1 );
-
-				/* translators: Time difference between two dates, in seconds. %s: Number of seconds. */
-				$since = sprintf( _n( '%s सेकेन्ड', '%s सेकेन्ड', $secs ), $secs );
+				$secs  = max( $diff, 1 );
+				$since = sprintf( '%s सेकेन्ड', $secs );
 				break;
 			case $diff < HOUR_IN_SECONDS:
-				$mins = max( round( $diff / MINUTE_IN_SECONDS ), 1 );
-
-				/* translators: Time difference between two dates, in minutes (min=minute). %s: Number of minutes. */
-				$since = sprintf( _n( '%s मिनेट', '%s मिनेट', $mins ), $mins );
+				$mins  = max( round( $diff / MINUTE_IN_SECONDS ), 1 );
+				$since = sprintf( '%s मिनेट', $mins );
 				break;
 			case $diff < DAY_IN_SECONDS:
 				$hours = max( round( $diff / HOUR_IN_SECONDS ), 1 );
-
-				/* translators: Time difference between two dates, in hours. %s: Number of hours. */
-				$since = sprintf( _n( '%s घण्टा', '%s घण्टा', $hours ), $hours );
+				$since = sprintf( '%s घण्टा', $hours );
 				break;
 			case $diff < WEEK_IN_SECONDS:
-				$days = max( round( $diff / DAY_IN_SECONDS ), 1 );
-
-				/* translators: Time difference between two dates, in days. %s: Number of days. */
-				$since = sprintf( _n( '%s दिन', '%s दिन', $days ), $days );
+				$days  = max( round( $diff / DAY_IN_SECONDS ), 1 );
+				$since = sprintf( '%s दिन', $days );
 				break;
 			case $diff < MONTH_IN_SECONDS:
 				$weeks = max( round( $diff / WEEK_IN_SECONDS ), 1 );
-
-				/* translators: Time difference between two dates, in weeks. %s: Number of weeks. */
-				$since = sprintf( _n( '%s हप्ता', '%s हप्ता', $weeks ), $weeks );
+				$since = sprintf( '%s हप्ता', $weeks );
 				break;
 			case $diff < YEAR_IN_SECONDS:
 				$months = max( round( $diff / MONTH_IN_SECONDS ), 1 );
-
-				/* translators: Time difference between two dates, in months. %s: Number of months. */
-				$since = sprintf( _n( '%s महिना', '%s महिना', $months ), $months );
+				$since  = sprintf( '%s महिना', $months );
 				break;
 			default:
 				$years = max( round( $diff / YEAR_IN_SECONDS ), 1 );
-
-				/* translators: Time difference between two dates, in years. %s: Number of years. */
-				$since = sprintf( _n( '%s वर्ष', '%s वर्ष', $years ), $years );
+				$since = sprintf( '%s वर्ष', $years );
 		}
 
-		/*Convert num to Nepali*/
+		/*
+		* Note: We are not using _n() here because in Nepali language,
+		* the singular and plural forms of these time units (सेकेन्ड, मिनेट, etc.)
+		* are the same. Therefore, pluralization is not necessary.
+		*/
+
+		/* Convert numbers to Nepali */
 		$since = strtr( $since, ndc_nepali_calendar()->eng_nep_num );
 
 		/**
@@ -195,6 +187,7 @@ if ( ! function_exists( 'ndc_human_time_diff' ) ) {
 		 */
 		return apply_filters( 'ndc_human_time_diff', $since, $diff, $from, $to );
 	}
+
 }
 
 if ( ! function_exists( 'ndc_get_post_types' ) ) {
