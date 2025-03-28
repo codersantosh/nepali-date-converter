@@ -18,6 +18,9 @@ Nepali Date Converter makes it easy to convert dates between English and Nepali 
 
 Fully rewritten for version 3.0.0, this release modernizes the plugin with improved accuracy and better compatibility.
 
+For the best experience with Nepali Date Converter, check out the free [CosmosWP](https://wordpress.org/themes/cosmoswp/) theme.
+[View Demo](https://demo.cosmoswp.com/demo-99/) → See Nepali Date Converter in action with real-world implementations.
+
 ## Key Features
 
 - 🔁 Convert English ↔ Nepali dates
@@ -78,6 +81,8 @@ After activation:
 
 - **NDC: Nepali Date Converter** - Interactive date conversion widget
 - **NDC: Today Date** - Displays current Nepali date
+
+Please visit [Nepali Date Converter](https://www.addonspress.com/wordpress-plugins/nepali-date-converter/) for more information about another shortcode [ndc-today-date] and for all available functions.
 
 ## Developer Functions
 

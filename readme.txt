@@ -13,7 +13,10 @@ Convert English dates to Nepali and vice versa, including WordPress post dates. 
 
 == Description ==
 
-Nepali Date Converter makes it easy to convert dates between English (Gregorian) and Nepali (Bikram Sambat) formats. Whether you're building a Nepali-language WordPress site or just need to display today’s Nepali date, this plugin has you covered.
+Nepali Date Converter makes converting dates between English (Gregorian) and Nepali (Bikram Sambat) formats easy. Whether you're building a Nepali-language WordPress site or just need to display today’s Nepali date, this plugin has you covered.
+
+For the best experience with Nepali Date Converter, check out the free [CosmosWP](https://wordpress.org/themes/cosmoswp/) theme. 
+[View Demo](https://demo.cosmoswp.com/demo-99/) → See Nepali Date Converter in action with real-world implementations.
 
 Includes:
 - Post Date to Nepali conversion
@@ -64,7 +67,7 @@ Display a Nepali date converter form.
 - `nepali_date_lang`: `nep_char` (e.g., `शुक्रबार, अशोज ८, २०७२`) or `eng_char`
 
 **Examples:**
-```php
+```
 [nepali-date-converter]
 [nepali-date-converter title="Nepali Date"]
 [nepali-date-converter title="Nepali date" result_format="l, F j, Y"]
@@ -86,10 +89,10 @@ Displays today’s Nepali date.
 - `ndc_convert_nep_to_eng()` – Convert using formatted string
 
 Use in code:
-```php
 echo do_shortcode('[nepali-date-converter]');
 echo do_shortcode('[ndc-today-date]');
 ```
+Please visit [Nepali Date Converter](https://www.addonspress.com/wordpress-plugins/nepali-date-converter/) for more information about another shortcode [ndc-today-date] and for all available functions.
 
 == Frequently Asked Questions ==
 
