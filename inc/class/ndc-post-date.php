@@ -623,7 +623,12 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 		 * @return string Converted Nepali date.
 		 * @since 2.0.0
 		 */
-		public function convert_post_date_to_nepali( string $the_date, string $format, WP_Post $post ): string {
+		public function convert_post_date_to_nepali( $the_date, $format, $post ) {
+
+			if ( ! $the_date || ! $post || ! isset( $post->post_date ) ) {
+				return $the_date;
+			}
+
 			// Skip if post type not supported.
 			if ( ! in_array( $post->post_type, $this->options['post_types'], true ) ) {
 				return $the_date;
@@ -664,7 +669,7 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 				$result_format
 			);
 
-			return $nepali_date['result'];
+			return $nepali_date && isset( $nepali_date['result'] ) ? $nepali_date['result'] : $the_date;
 		}
 
 		/**

@@ -637,19 +637,24 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 			$sec  = $input_date['sec'] ?? '';
 
 			$date_str = sprintf( '%d-%d-%d', $year, $month, $day );
-			if ( $hour ) {
+
+			if ( isset( $hour ) ) {
 				$date_str .= sprintf( ' %02d', $hour );
-			}
-			if ( $min ) {
-				$date_str .= sprintf( ':%02d', $min );
-			}
-			if ( $sec ) {
-				$date_str .= sprintf( ':%02d', $sec );
+				if ( isset( $min ) ) {
+					$date_str .= sprintf( ':%02d', $min );
+					if ( isset( $sec ) ) {
+						$date_str .= sprintf( ':%02d', $sec );
+					}
+				}
 			}
 
-			$timezone  = wp_timezone();
-			$datetime  = new DateTimeImmutable( $date_str, $timezone );
-			$timestamp = $datetime->getTimestamp();
+			try {
+				$timezone  = wp_timezone();
+				$datetime  = new DateTimeImmutable( $date_str, $timezone );
+				$timestamp = $datetime->getTimestamp();
+			} catch ( Exception $e ) {
+				return $input_date;
+			}
 
 			// Date format replacements.
 			$replacements = array(
