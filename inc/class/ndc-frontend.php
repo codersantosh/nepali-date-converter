@@ -339,15 +339,28 @@ if ( ! class_exists( 'NDC_Frontend' ) ) {
 		 * @since 2.0.0
 		 */
 		private function get_current_english_date( string $format ): array {
-			$date_string = wp_date( 'Y-m-d' );
-			$dates       = explode( '-', $date_string );
+			try {
+				$timezone    = new DateTimeZone( 'Asia/Kathmandu' );
+				$datetime    = new DateTime( 'now', $timezone );
+				$date_string = $datetime->format( 'Y-m-d' );
+				$dates       = explode( '-', $date_string );
 
-			return array(
-				'year'      => (int) $dates[0],
-				'month'     => (int) $dates[1],
-				'day'       => (int) $dates[2],
-				'formatted' => wp_date( $format ),
-			);
+				return array(
+					'year'      => (int) $dates[0],
+					'month'     => (int) $dates[1],
+					'day'       => (int) $dates[2],
+					'formatted' => $datetime->format( $format ),
+				);
+			} catch ( Exception $e ) {
+				// Fallback: return current UTC date.
+				$dates = explode( '-', gmdate( 'Y-m-d' ) );
+				return array(
+					'year'      => (int) $dates[0],
+					'month'     => (int) $dates[1],
+					'day'       => (int) $dates[2],
+					'formatted' => gmdate( $format ),
+				);
+			}
 		}
 
 		/**
