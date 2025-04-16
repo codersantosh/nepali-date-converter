@@ -200,7 +200,7 @@ msgstr ""
 msgid "Invalid date format"
 msgstr ""
 
-#. translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali wp_date range.
+#. translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali date range.
 #: inc/frameworks/nepali-calendar/nepali-calendar.php:462
 #: inc/frameworks/nepali-calendar/nepali-calendar.php:494
 msgid "Supported only between %1$d-%2$d"

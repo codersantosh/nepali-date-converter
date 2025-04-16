@@ -661,7 +661,7 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 			}
 
 			// Convert to Nepali date.
-			$date_parts = explode( '-', wp_date( 'Y-m-d-H-i-s', $post_timestamp ) );
+			$date_parts = explode( '-', gmdate( 'Y-m-d-H-i-s', $post_timestamp ) );
 
 			$nepali_date = ndc_eng_to_nep_date(
 				array(

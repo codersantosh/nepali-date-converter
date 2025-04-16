@@ -353,16 +353,15 @@ if ( ! class_exists( 'NDC_Frontend' ) ) {
 				);
 			} catch ( Exception $e ) {
 				// Fallback: return current UTC date.
-				$dates = explode( '-', date( 'Y-m-d' ) );//phpcs:ignore
+				$dates = explode( '-', gmdate( 'Y-m-d' ) );
 				return array(
 					'year'      => (int) $dates[0],
 					'month'     => (int) $dates[1],
 					'day'       => (int) $dates[2],
-					'formatted' => date( $format ),//phpcs:ignore
+					'formatted' => gmdate( $format ),
 				);
 			}
 		}
-
 
 		/**
 		 * Gets current Nepali date information.

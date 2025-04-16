@@ -380,14 +380,14 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 		 */
 		private $date_data = array(
 			'eng_date' => array(
-				'year'    => '',
-				'month'   => '',
-				'wp_date' => '',
+				'year'  => '',
+				'month' => '',
+				'date'  => '',
 			),
 			'nep_date' => array(
-				'year'    => '',
-				'month'   => '',
-				'wp_date' => '',
+				'year'  => '',
+				'month' => '',
+				'date'  => '',
 			),
 			'from'     => '',
 			'result'   => '',
@@ -415,7 +415,7 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 		}
 
 		/**
-		 * Gets the Nepali wp_date range
+		 * Gets the Nepali date range
 		 *
 		 * @return array First and last years in the Nepali calendar data
 		 * @since 1.0.0
@@ -431,7 +431,7 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 		}
 
 		/**
-		 * Gets the approximate English wp_date range
+		 * Gets the approximate English date range
 		 *
 		 * @return array Approximate English years corresponding to Nepali range
 		 * @since 1.0.0
@@ -445,7 +445,7 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 		}
 
 		/**
-		 * Checks if an English wp_date is within the supported range
+		 * Checks if an English date is within the supported range
 		 *
 		 * @param int $year Year.
 		 * @param int $month Month.
@@ -458,7 +458,7 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 
 			if ( $year < $english_range['first'] || $year > $english_range['last'] ) {
 				return sprintf(
-				// translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali wp_date range.
+				// translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali date range.
 					__( 'Supported only between %1$d-%2$d', 'nepali-date-converter' ),
 					$english_range['first'],
 					$english_range['last']
@@ -477,7 +477,7 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 		}
 
 		/**
-		 * Checks if a Nepali wp_date is within the supported range
+		 * Checks if a Nepali date is within the supported range
 		 *
 		 * @param int $year Year.
 		 * @param int $month Month.
@@ -490,7 +490,7 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 
 			if ( $year < $nepali_range['first'] || $year > $nepali_range['last'] ) {
 				return sprintf(
-				// translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali wp_date range.
+				// translators: %1$d represents the first year, %2$d represents the last year in the supported Nepali date range.
 					__( 'Supported only between %1$d-%2$d', 'nepali-date-converter' ),
 					$nepali_range['first'],
 					$nepali_range['last']
@@ -540,12 +540,12 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 		}
 
 		/**
-		 * Converts English wp_date to Nepali wp_date
+		 * Converts English date to Nepali date.
 		 *
 		 * @param array  $input_date Array with year, month, day, hour, min, sec.
 		 * @param string $date_format Output format ('nep_char' or 'eng_char').
-		 * @param string $format PHP wp_date format string.
-		 * @return array Converted wp_date data.
+		 * @param string $format PHP date format string.
+		 * @return array Converted date data.
 		 * @since 1.0.0
 		 */
 		public function eng_to_nep( array $input_date, string $date_format = 'nep_char', string $format = 'D, F j, Y' ): array {
@@ -582,21 +582,17 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 
 			$total_days = 0;
 
-			// Calculate total days from reference English date.
 			for ( $y = 0; $y < ( $year - $ref_eng_year ); $y++ ) {
 				$total_days += $this->is_leap_year( $ref_eng_year + $y ) ? 366 : 365;
 			}
 
-			// Add days from months in current year.
 			$month_days = $this->is_leap_year( $year ) ? $this->leap_month_days : $this->month_days;
 			for ( $m = 0; $m < ( $month - 1 ); $m++ ) {
-				$total_days += $month_days [ $m ];
+				$total_days += $month_days[ $m ];
 			}
 
-			// Add days in current month.
 			$total_days += $day;
 
-			// Convert to Nepali date.
 			$nep_year  = $ref_nep_year;
 			$nep_month = $ref_nep_month;
 			$nep_day   = $ref_nep_day;
@@ -626,168 +622,129 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 				--$total_days;
 			}
 
-			/*
-			Format the date.
-			* no supported
-			S, c, r, U
-			may be c= $y.'-'.$m.'-'.$np_date.'स'.wp_date('H',$create_date).':'.wp_date('i',$create_date).':'.wp_date('s',$create_date).'+00:00',
-			*/
-			$hour = $input_date['hour'] ?? '';
-			$min  = $input_date['min'] ?? '';
-			$sec  = $input_date['sec'] ?? '';
+			$hour = $input_date['hour'] ?? 0;
+			$min  = $input_date['min'] ?? 0;
+			$sec  = $input_date['sec'] ?? 0;
 
-			$date_str = sprintf( '%d-%d-%d', $year, $month, $day );
-
-			if ( isset( $hour ) ) {
-				$date_str .= sprintf( ' %02d', $hour );
-				if ( isset( $min ) ) {
-					$date_str .= sprintf( ':%02d', $min );
-					if ( isset( $sec ) ) {
-						$date_str .= sprintf( ':%02d', $sec );
-					}
-				}
-			}
+			$date_str = sprintf( '%04d-%02d-%02d %02d:%02d:%02d', $year, $month, $day, $hour, $min, $sec );
 
 			try {
-				$timezone  = wp_timezone();
-				$datetime  = new DateTimeImmutable( $date_str, $timezone );
+				$datetime  = new DateTimeImmutable( $date_str, new DateTimeZone( 'UTC' ) );
 				$timestamp = $datetime->getTimestamp();
 			} catch ( Exception $e ) {
 				return $input_date;
 			}
 
-			// Date format replacements.
 			$replacements = array(
 				'd' => $this->get_two_char_str( $nep_day ),
 				'j' => $nep_day,
-				'l' => wp_date( 'l', $timestamp ),
-				'D' => wp_date( 'D', $timestamp ),
+				'l' => gmdate( 'l', $timestamp ),
+				'D' => gmdate( 'D', $timestamp ),
 				'm' => $this->get_two_char_str( $nep_month ),
 				'n' => $nep_month,
 				'F' => array_keys( $this->long_eng_nep_mth )[ $nep_month - 1 ],
 				'M' => array_keys( $this->short_eng_nep_mth )[ $nep_month - 1 ],
 				'Y' => $nep_year,
 				'y' => substr( $nep_year, 2 ),
-				'a' => wp_date( 'a', $timestamp ),
-				'A' => wp_date( 'A', $timestamp ),
-				'g' => wp_date( 'g', $timestamp ),
-				'h' => wp_date( 'h', $timestamp ),
-				'G' => wp_date( 'G', $timestamp ),
-				'H' => wp_date( 'H', $timestamp ),
-				'i' => wp_date( 'i', $timestamp ),
-				's' => wp_date( 's', $timestamp ),
-				'T' => wp_date( 'T', $timestamp ),
+				'a' => gmdate( 'a', $timestamp ),
+				'A' => gmdate( 'A', $timestamp ),
+				'g' => gmdate( 'g', $timestamp ),
+				'h' => gmdate( 'h', $timestamp ),
+				'G' => gmdate( 'G', $timestamp ),
+				'H' => gmdate( 'H', $timestamp ),
+				'i' => gmdate( 'i', $timestamp ),
+				's' => gmdate( 's', $timestamp ),
+				'T' => gmdate( 'T', $timestamp ),
 				'c' => sprintf(
-					'%d-%d-%dस%02d:%02d:%02d+00:00',
+					'%d-%02d-%02dस%02d:%02d:%02d+00:00',
 					$nep_year,
 					$nep_month,
 					$nep_day,
-					wp_date( 'H', $timestamp ),
-					wp_date( 'i', $timestamp ),
-					wp_date( 's', $timestamp )
+					gmdate( 'H', $timestamp ),
+					gmdate( 'i', $timestamp ),
+					gmdate( 's', $timestamp )
 				),
 				'r' => sprintf(
-					'%s, %d %s %d %02d:%02d:%02d +0200',
-					wp_date( 'D', $timestamp ),
+					'%s, %d %s %d %02d:%02d:%02d +0000',
+					gmdate( 'D', $timestamp ),
 					$nep_day,
 					array_keys( $this->short_eng_nep_mth )[ $nep_month - 1 ],
 					$nep_year,
-					wp_date( 'H', $timestamp ),
-					wp_date( 'i', $timestamp ),
-					wp_date( 's', $timestamp )
+					gmdate( 'H', $timestamp ),
+					gmdate( 'i', $timestamp ),
+					gmdate( 's', $timestamp )
 				),
 			);
 
 			$nepali_date = strtr( $format, $replacements );
 
-			// Temporary placeholders for day names.
 			$day_placeholder = 'day' . $day_of_week;
-			$long_day_map    = array(
-				'Sunday'    => $day_placeholder . '_long',
-				'Monday'    => $day_placeholder . '_long',
-				'Tuesday'   => $day_placeholder . '_long',
-				'Wednesday' => $day_placeholder . '_long',
-				'Thursday'  => $day_placeholder . '_long',
-				'Friday'    => $day_placeholder . '_long',
-				'Saturday'  => $day_placeholder . '_long',
-			);
-			$short_day_map   = array(
-				'Sun' => $day_placeholder . '_short',
-				'Mon' => $day_placeholder . '_short',
-				'Tue' => $day_placeholder . '_short',
-				'Wed' => $day_placeholder . '_short',
-				'Thu' => $day_placeholder . '_short',
-				'Fri' => $day_placeholder . '_short',
-				'Sat' => $day_placeholder . '_short',
-			);
+			$long_day_map    = array_fill_keys( array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ), $day_placeholder . '_long' );
+			$short_day_map   = array_fill_keys( array( 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ), $day_placeholder . '_short' );
 
 			if ( 'eng_char' === $date_format ) {
 				$nepali_date = strtr( $nepali_date, $this->long_eng_nep_mth_in_eng );
 				$nepali_date = strtr( $nepali_date, $this->short_eng_nep_mth_in_eng );
-
-				$long_day_replace  = array(
-					'day1_long' => 'Aaitabar',
-					'day2_long' => 'Sombar',
-					'day3_long' => 'Mangalbar',
-					'day4_long' => 'Budhabar',
-					'day5_long' => 'Bihibar',
-					'day6_long' => 'Sukrabar',
-					'day7_long' => 'Sanibar',
-				);
-				$short_day_replace = array(
-					'day1_short' => 'Aaita',
-					'day2_short' => 'Som',
-					'day3_short' => 'Mangal',
-					'day4_short' => 'Budha',
-					'day5_short' => 'Bihi',
-					'day6_short' => 'Sukra',
-					'day7_short' => 'Sani',
-				);
-
 				$nepali_date = strtr( $nepali_date, $long_day_map );
 				$nepali_date = strtr( $nepali_date, $short_day_map );
-				$nepali_date = strtr( $nepali_date, $long_day_replace );
-				$nepali_date = strtr( $nepali_date, $short_day_replace );
-
-				$am_pm_replace = array(
-					'am' => 'Bihana',
-					'pm' => 'Madhyanha',
+				$nepali_date = strtr(
+					$nepali_date,
+					array(
+						'day1_long'  => 'Aaitabar',
+						'day2_long'  => 'Sombar',
+						'day3_long'  => 'Mangalbar',
+						'day4_long'  => 'Budhabar',
+						'day5_long'  => 'Bihibar',
+						'day6_long'  => 'Sukrabar',
+						'day7_long'  => 'Sanibar',
+						'day1_short' => 'Aaita',
+						'day2_short' => 'Som',
+						'day3_short' => 'Mangal',
+						'day4_short' => 'Budha',
+						'day5_short' => 'Bihi',
+						'day6_short' => 'Sukra',
+						'day7_short' => 'Sani',
+					)
 				);
-				$nepali_date   = strtr( $nepali_date, $am_pm_replace );
+				$nepali_date = strtr(
+					$nepali_date,
+					array(
+						'am' => 'Bihana',
+						'pm' => 'Madhyanha',
+					)
+				);
 			} else {
 				$nepali_date = strtr( $nepali_date, $this->eng_nep_num );
 				$nepali_date = strtr( $nepali_date, $this->long_eng_nep_mth );
 				$nepali_date = strtr( $nepali_date, $this->short_eng_nep_mth );
-
-				$long_day_replace  = array(
-					'day1_long' => 'आइतवार',
-					'day2_long' => 'सोमवार',
-					'day3_long' => 'मङ्लबार',
-					'day4_long' => 'बुधबार',
-					'day5_long' => 'बिहिबार',
-					'day6_long' => 'शुक्रबार',
-					'day7_long' => 'शनिबार',
-				);
-				$short_day_replace = array(
-					'day1_short' => 'आइत',
-					'day2_short' => 'सोम',
-					'day3_short' => 'मङ्ल',
-					'day4_short' => 'बुध',
-					'day5_short' => 'बिहि',
-					'day6_short' => 'शुक्र',
-					'day7_short' => 'शनि',
-				);
-
 				$nepali_date = strtr( $nepali_date, $long_day_map );
 				$nepali_date = strtr( $nepali_date, $short_day_map );
-				$nepali_date = strtr( $nepali_date, $long_day_replace );
-				$nepali_date = strtr( $nepali_date, $short_day_replace );
-
-				$am_pm_replace = array(
-					'am' => 'बिहान',
-					'pm' => 'मध्यान्ह',
+				$nepali_date = strtr(
+					$nepali_date,
+					array(
+						'day1_long'  => 'आइतवार',
+						'day2_long'  => 'सोमवार',
+						'day3_long'  => 'मङ्लबार',
+						'day4_long'  => 'बुधबार',
+						'day5_long'  => 'बिहिबार',
+						'day6_long'  => 'शुक्रबार',
+						'day7_long'  => 'शनिबार',
+						'day1_short' => 'आइत',
+						'day2_short' => 'सोम',
+						'day3_short' => 'मङ्ल',
+						'day4_short' => 'बुध',
+						'day5_short' => 'बिहि',
+						'day6_short' => 'शुक्र',
+						'day7_short' => 'शनि',
+					)
 				);
-				$nepali_date   = strtr( $nepali_date, $am_pm_replace );
+				$nepali_date = strtr(
+					$nepali_date,
+					array(
+						'am' => 'बिहान',
+						'pm' => 'मध्यान्ह',
+					)
+				);
 			}
 
 			$this->date_data['nep_date'] = array(
@@ -799,7 +756,6 @@ if ( ! class_exists( 'NDC_Nepali_Calendar' ) ) {
 
 			return $this->date_data;
 		}
-
 
 		/**
 		 * Converts Nepali date to English date
