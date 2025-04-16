@@ -636,18 +636,25 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 
 			// Determine format to use.
 			$result_format = $format && ! $this->options['force_format']
-			? $format
-			: ( 'ndc-date-format-custom' !== $this->options['date_format']['selected']
-				? $this->options['date_format']['selected']
-				: $this->options['date_format']['custom'] );
+				? $format
+				: ( 'ndc-date-format-custom' !== $this->options['date_format']['selected']
+			? $this->options['date_format']['selected']
+			: $this->options['date_format']['custom'] );
 
 			// Handle Unix timestamp format.
 			if ( 'U' === $result_format || 'U' === $format ) {
 				return strtr( $the_date, ndc_nepali_calendar()->eng_nep_num );
 			}
 
+			try {
+				$date = new DateTime( $the_date );
+				$date->setTimezone( new DateTimeZone( 'Asia/Kathmandu' ) );
+				$post_timestamp = $date->getTimestamp();
+			} catch ( Exception $e ) {
+				return $the_date;
+			}
+
 			// Handle human time diff if enabled.
-			$post_timestamp = strtotime( $post->post_date );
 			if ( $this->should_use_human_time_diff() ) {
 				$current_local_timestamp = strtotime( get_date_from_gmt( gmdate( 'Y-m-d H:i:s' ), 'Y-m-d H:i:s' ) );
 				return ndc_human_time_diff( $post_timestamp, $current_local_timestamp ) . ' ' . esc_html( $this->options['human_time_diff']['suffix'] );
@@ -671,6 +678,7 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 
 			return $nepali_date && isset( $nepali_date['result'] ) ? $nepali_date['result'] : $the_date;
 		}
+
 
 		/**
 		 * Check if human time diff should be used
