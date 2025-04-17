@@ -3,9 +3,9 @@ Contributors: addonspress, acmeit, codersantosh
 Donate link: https://www.addonspress.com/
 Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nepali date converter, Nepali to English date converter
 Requires at least: 4.9
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 3.0.2
+Stable tag: 3.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -120,6 +120,11 @@ Absolutely. Use the helper functions or shortcodes as needed.
 7. Combined output via shortcode
 
 == Changelog ==
+
+= 3.0.3 - 2025-04-17 =
+* Added: WordPress latest compatibility
+* Fixed: Adjusted post date to 5:45 AM in Kathmandu time zone before converting to Nepali date format.  
+* Fixed: Replaced `date()` with `gmdate()` to ensure UTC-based date formatting and avoid time zone issues.
 
 = 3.0.2 - 2025-03-29 =
 * Fixed: Ensured 0 hour is correctly handled in date formatting
