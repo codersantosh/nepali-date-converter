@@ -1,0 +1,147 @@
+name: Deploy to WordPress.org
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Simulate deployment without committing"
+        type: boolean
+        default: false
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag format
+        id: validate-tag
+        run: |
+          if [[ ! $GITHUB_REF =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag must follow semantic versioning format (vX.Y.Z)"
+            exit 1
+          fi
+          echo "Tag format validated successfully"
+
+      - name: Setup WordPress CLI
+        run: |
+          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+
+      - name: Cache SVN installation
+        uses: actions/cache@v3
+        id: cache-svn
+        with:
+          path: /usr/bin/svn
+          key: ${{ runner.os }}-svn
+
+      - name: Setup SVN
+        if: steps.cache-svn.outputs.cache-hit != 'true'
+        run: sudo apt-get install -y subversion
+
+      - name: Set up environment
+        id: env
+        run: |
+          PLUGIN_SLUG=$(basename "$(pwd)")
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          SVN_URL="https://plugins.svn.wordpress.org/$PLUGIN_SLUG"
+          SVN_DIR="${{ runner.temp }}/$PLUGIN_SLUG-svn"
+          
+          echo "PLUGIN_SLUG=$PLUGIN_SLUG" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "SVN_URL=$SVN_URL" >> $GITHUB_OUTPUT
+          echo "SVN_DIR=$SVN_DIR" >> $GITHUB_OUTPUT
+
+      - name: Export release files
+        run: |
+          mkdir -p release
+          rsync -av --delete \
+            --exclude='.git*' \
+            --exclude='.github' \
+            --exclude='README.md' \
+            --exclude='LICENSE' \
+            --exclude='*.sh' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            ./ release/
+
+      - name: Generate .pot file
+        run: |
+          echo "::group::Generating .pot file"
+          wp i18n make-pot . "release/${{ steps.env.outputs.PLUGIN_SLUG }}.pot" \
+            --exclude="tests,node_modules,.github" \
+            --domain="${{ steps.env.outputs.PLUGIN_SLUG }}" \
+            --package-name="${{ steps.env.outputs.PLUGIN_SLUG }}" \
+            --headers="{\"Project-Id-Version\": \"${{ steps.env.outputs.PLUGIN_SLUG }} ${{ steps.env.outputs.TAG_NAME }}\"}"
+          echo "::endgroup::"
+
+      - name: Verify .pot file
+        run: |
+          if [ ! -f "release/${{ steps.env.outputs.PLUGIN_SLUG }}.pot" ]; then
+            echo "::error::.pot file generation failed!"
+            exit 1
+          fi
+          echo "Generated .pot file:"
+          head -n 10 "release/${{ steps.env.outputs.PLUGIN_SLUG }}.pot"
+
+      - name: Show release contents (debug)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: ls -la release/
+
+      - name: Deploy to WordPress.org
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          echo "::group::SVN Checkout"
+          svn checkout --quiet "${{ steps.env.outputs.SVN_URL }}" "${{ steps.env.outputs.SVN_DIR }}"
+          echo "::endgroup::"
+
+          echo "::group::Copying Files"
+          rsync -av --delete release/ "${{ steps.env.outputs.SVN_DIR }}/trunk/"
+          mkdir -p "${{ steps.env.outputs.SVN_DIR }}/tags/${{ steps.env.outputs.TAG_NAME }}"
+          rsync -av --delete release/ "${{ steps.env.outputs.SVN_DIR }}/tags/${{ steps.env.outputs.TAG_NAME }}/"
+          echo "::endgroup::"
+
+          cd "${{ steps.env.outputs.SVN_DIR }}"
+
+          echo "::group::SVN Update"
+          svn update --quiet
+          echo "::endgroup::"
+
+          echo "::group::SVN Changes"
+          svn add --force . --auto-props --parents --depth infinity -q
+          svn status | grep '^!' | awk '{print $2}' | xargs -r svn del --quiet
+          echo "::endgroup::"
+
+          echo "::group::Change Detection"
+          if svn status | grep -q '^[!ADMRC]'; then
+            if ${{ inputs.dry-run || false }}; then
+              echo "::warning::Dry run: Would commit the following changes:"
+              svn status
+              echo "Would commit with message: 'Deploy version ${{ steps.env.outputs.TAG_NAME }}'"
+            else
+              echo "Changes detected, committing..."
+              svn commit --message "Deploy version ${{ steps.env.outputs.TAG_NAME }}"
+              echo "::notice::Deployment completed successfully!"
+            fi
+          else
+            echo "No changes detected. Skipping commit."
+          fi
+          echo "::endgroup::"
