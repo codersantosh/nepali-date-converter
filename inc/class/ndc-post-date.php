@@ -495,7 +495,7 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 									_ajax_nonce: ndcNonce
 								}, function(d) {
 									spinner.removeClass('is-active');
-									example.html(d);
+									example.html(d.data || d);
 								}).fail(function(xhr) {
 									spinner.removeClass('is-active');
 									example.text('Error: ' + xhr.responseText);
@@ -612,6 +612,9 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 			foreach ( $filters as $filter ) {
 				add_filter( $filter, array( $this, 'convert_post_date_to_nepali' ), 10, 3 );
 			}
+
+			// Add filter to fix time display.
+			add_filter( 'get_the_time', array( $this, 'fix_time_display' ), 999, 3 );
 		}
 
 		/**
@@ -643,15 +646,22 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 
 			// Handle Unix timestamp format.
 			if ( 'U' === $result_format || 'U' === $format ) {
-				return strtr( $the_date, ndc_nepali_calendar()->eng_nep_num );
+				return (int) $the_date;
 			}
 
 			try {
-				$date = new DateTime( $the_date );
+				$post_date = isset( $post->post_date ) ? $post->post_date : $the_date;
+				$date      = new DateTime( $post_date );
 				$date->setTimezone( new DateTimeZone( 'Asia/Kathmandu' ) );
 				$post_timestamp = $date->getTimestamp();
 			} catch ( Exception $e ) {
-				return $the_date;
+				try {
+					$date = new DateTime( $the_date );
+					$date->setTimezone( new DateTimeZone( 'Asia/Kathmandu' ) );
+					$post_timestamp = $date->getTimestamp();
+				} catch ( Exception $e ) {
+					return $the_date;
+				}
 			}
 
 			// Handle human time diff if enabled.
@@ -679,6 +689,29 @@ if ( ! class_exists( 'NDC_Post_Date' ) ) {
 			return $nepali_date && isset( $nepali_date['result'] ) ? $nepali_date['result'] : $the_date;
 		}
 
+
+		/**
+		 * New method to fix "00:00" time issue
+		 *
+		 * @link https://github.com/codersantosh/nepali-date-converter/issues/13
+		 *
+		 * @param string       $the_time Original time string.
+		 * @param string       $format Time format.
+		 * @param WP_Post|null $post Post object.
+		 * @return string Corrected time string.
+		 */
+		public function fix_time_display( $the_time, $format, $post = null ) {
+			if ( 'H:i' === $format && '00:00' === $the_time && $post && isset( $post->post_date ) ) {
+				try {
+					$date = new DateTime( $post->post_date );
+					$date->setTimezone( new DateTimeZone( 'Asia/Kathmandu' ) );
+					return $date->format( 'H:i' );
+				} catch ( Exception $e ) {
+					return $the_time;
+				}
+			}
+			return $the_time;
+		}
 
 		/**
 		 * Check if human time diff should be used
