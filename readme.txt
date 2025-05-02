@@ -5,7 +5,7 @@ Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nep
 Requires at least: 4.9
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 3.0.3
+Stable tag: 3.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -120,6 +120,11 @@ Absolutely. Use the helper functions or shortcodes as needed.
 7. Combined output via shortcode
 
 == Changelog ==
+
+= 3.0.4 - 2025-05-02 =
+* Fixed: [Return proper integer for format 'U'](https://github.com/codersantosh/nepali-date-converter/issues/13)  
+* Fixed: [Better post date extraction](https://github.com/codersantosh/nepali-date-converter/issues/13)  
+* Fixed: [Add a filter to correct time display](https://github.com/codersantosh/nepali-date-converter/issues/13)  
 
 = 3.0.3 - 2025-04-17 =
 * Added: WordPress latest compatibility
