@@ -3,9 +3,9 @@ Contributors: addonspress, acmeit, codersantosh
 Donate link: https://www.addonspress.com/
 Tags: Nepali post date, Nepali date converter, today Nepali date, English to Nepali date converter, Nepali to English date converter
 Requires at least: 4.9
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 3.0.5
+Stable tag: 3.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -120,6 +120,11 @@ Absolutely. Use the helper functions or shortcodes as needed.
 7. Combined output via shortcode
 
 == Changelog ==
+
+= 3.0.6 - 2026-10-17 =
+* Fixed: Corrected the number of days for Ashoj in BS 2083 (30 to 31).
+* Fixed: Corrected the number of days for Shrawan in BS 2096 (31 to 32).
+* Updated: Tested up to WordPress 7.1.
 
 = 3.0.5 =
 * Fixed: Corrected the number of days for months in BS 2082.

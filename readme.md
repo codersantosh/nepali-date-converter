@@ -122,6 +122,12 @@ Absolutely! Use the provided helper functions or shortcodes as needed.
 
 ## Changelog
 
+### 3.0.6 - 2026-10-17
+
+- Fixed the number of days for Ashoj in BS 2083 (30 to 31)
+- Fixed the number of days for Shrawan in BS 2096 (31 to 32)
+- Tested up to WordPress 7.1
+
 ### 3.0.0 - 2025-03-28
 
 - Complete plugin rewrite with modern codebase
